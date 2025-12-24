@@ -1,6 +1,5 @@
 package com.rentit.filter;
 
-import com.rentit.repository.UserRepository;
 import com.rentit.service.CustomUserDetailService;
 import com.rentit.utility.JwtUtil;
 import jakarta.servlet.FilterChain;
@@ -27,11 +26,13 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        System.out.println("Enter in doFilterInternal");
         String authHeader = request.getHeader("Authorization");
         String token = null;
         String username = null;
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            System.out.println("Enter in token finded");
             token = authHeader.substring(7);
             username = jwtUtil.extractUsername(token);
         }
@@ -39,6 +40,7 @@ public class JwtFilter extends OncePerRequestFilter {
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = customUserDetailService.loadUserByUsername(username);
             if (jwtUtil.validateToken(token, userDetails)) {
+                System.out.println("Enter in context settled");
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);

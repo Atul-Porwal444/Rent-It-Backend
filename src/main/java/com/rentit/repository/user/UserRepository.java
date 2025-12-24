@@ -1,6 +1,6 @@
-package com.rentit.repository;
+package com.rentit.repository.user;
 
-import com.rentit.entity.UserEntity;
+import com.rentit.entity.user.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

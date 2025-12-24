@@ -1,7 +1,7 @@
 package com.rentit.service;
 
-import com.rentit.entity.UserEntity;
-import com.rentit.repository.UserRepository;
+import com.rentit.entity.user.UserEntity;
+import com.rentit.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

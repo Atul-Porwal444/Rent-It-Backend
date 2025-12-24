@@ -1,16 +1,14 @@
 package com.rentit.service.authservice;
 
-import com.rentit.entity.UserEntity;
-import com.rentit.payload.request.LoginRequest;
-import com.rentit.payload.request.SignupRequest;
-import com.rentit.repository.UserRepository;
+import com.rentit.entity.user.UserEntity;
+import com.rentit.payload.request.auth.LoginRequest;
+import com.rentit.payload.request.auth.SignupRequest;
+import com.rentit.repository.user.UserRepository;
 import com.rentit.utility.JwtUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

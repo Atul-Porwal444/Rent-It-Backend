@@ -1,4 +1,4 @@
-package com.rentit.entity;
+package com.rentit.entity.user;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -21,4 +21,10 @@ public class UserEntity {
 
     @Column(nullable = false)
     private String password;
+
+    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private UserProfileEntity profile;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private ProfileImage profileImage;
 }

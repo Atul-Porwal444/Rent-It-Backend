@@ -1,7 +1,7 @@
 package com.rentit.controller.authcontroller;
 
-import com.rentit.payload.request.LoginRequest;
-import com.rentit.payload.request.SignupRequest;
+import com.rentit.payload.request.auth.LoginRequest;
+import com.rentit.payload.request.auth.SignupRequest;
 import com.rentit.payload.response.ApiResponse;
 import com.rentit.service.authservice.AuthService;
 import lombok.RequiredArgsConstructor;
