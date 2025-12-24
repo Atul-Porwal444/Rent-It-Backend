@@ -8,12 +8,12 @@ import com.rentit.service.userprofileservice.UserProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.security.Principal;
+import java.util.HashMap;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,6 +37,20 @@ public class UserProfileController {
         System.out.println("Enter in controller");
         userProfileService.updateUserProfile(userId, userProfileUpdateRequest);
         return ResponseEntity.ok(new ApiResponse(true, "Profile updated successfully", userProfileUpdateRequest));
+    }
+
+    @PostMapping("/profile-image")
+    public ResponseEntity<ApiResponse> updateProfileImage(@RequestParam("image") MultipartFile file, Principal principal) {
+        try {
+            Long userId = getUserIdFromPrincipal(principal);
+            String fileName = userProfileService.updateProfileImage(userId,file);
+
+            return ResponseEntity.ok(new ApiResponse(true, "Image uploaded successfully",  new HashMap<>(){{
+                put("file",fileName);
+            }}));
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body(new ApiResponse(false, "Image upload failed: " + e.getMessage(), null));
+        }
     }
 
 }
