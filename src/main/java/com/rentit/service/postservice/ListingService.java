@@ -10,14 +10,23 @@ import com.rentit.payload.request.post.RoommateListingRequest;
 import com.rentit.repository.post.RoomListingRepository;
 import com.rentit.repository.post.RoommateListingRepository;
 import com.rentit.repository.user.UserRepository;
+import com.rentit.service.userprofileservice.FileService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class ListingService {
+
+    private final FileService fileService;
 
     private final UserRepository userRepository;
 
@@ -25,10 +34,15 @@ public class ListingService {
 
     private final RoommateListingRepository roommateListingRepository;
 
-    @Transactional
-    public void createRoomListing(Long userId, RoomListingRequest request) {
-        UserEntity userEntity = userRepository.findById(userId).
+    private UserEntity getUserFromPrincipal(Principal principal) {
+        String email = principal.getName();
+        return userRepository.findByEmail(email).
                 orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
+    @Transactional
+    public void createRoomListing(Principal principal, RoomListingRequest request, List<MultipartFile> images) throws IOException {
+        UserEntity userEntity = getUserFromPrincipal(principal);
 
         RoomListing room = new RoomListing();
 
@@ -37,14 +51,21 @@ public class ListingService {
         room.setSecurityDeposit(request.getSecurityDeposit());
         room.setAvailabilityStatus(request.getAvailabilityStatus());
 
+        List<String> imageUrls = new ArrayList<>();
+        for(MultipartFile file : images) {
+            String fileName = fileService.uploadImage(file);
+            imageUrls.add(fileName);
+        }
+
+        room.setImageUrls(imageUrls);
+
         room.setUser(userEntity);
         roomListingRepository.save(room);
     }
 
     @Transactional
-    public void createRoommateListing(Long userId, RoommateListingRequest request) {
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public void createRoommateListing(Principal principal, RoommateListingRequest request, List<MultipartFile> images) throws IOException {
+        UserEntity user = getUserFromPrincipal(principal);
 
         RoommateListing roommatePost = new RoommateListing();
 
@@ -55,6 +76,14 @@ public class ListingService {
         roommatePost.setDietaryPreference(request.getDietaryPreference());
         roommatePost.setCurrentRoommates(request.getCurrentRoommates());
         roommatePost.setNeededRoommates(request.getNeededRoommates());
+
+        List<String> imageUrls = new ArrayList<>();
+        for(MultipartFile file : images) {
+            String fileName = fileService.uploadImage(file);
+            imageUrls.add(fileName);
+        }
+
+        roommatePost.setImageUrls(imageUrls);
 
         roommatePost.setUser(user);
         roommateListingRepository.save(roommatePost);

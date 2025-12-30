@@ -13,8 +13,6 @@ public abstract class BaseListingRequest {
     private String description;
     private String bhkType;
 
-    List<String> imageUrls;
-
     private int floorNumber;
     private boolean hasParking;
     private boolean isFurnished;

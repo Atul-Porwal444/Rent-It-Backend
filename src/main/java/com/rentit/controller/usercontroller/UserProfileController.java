@@ -24,29 +24,20 @@ public class UserProfileController {
 
     private final UserRepository userRepository;
 
-    private Long getUserIdFromPrincipal(Principal principal) {
-        String email = principal.getName();
-        UserEntity userEntity = userRepository.findByEmail(email).
-                orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        return userEntity.getId();
-    }
-
     @PutMapping("/profile")
     public ResponseEntity<ApiResponse> updateUserProfile(@RequestBody UserProfileUpdateRequest userProfileUpdateRequest, Principal principal) {
-        Long userId = getUserIdFromPrincipal(principal);
         System.out.println("Enter in controller");
-        userProfileService.updateUserProfile(userId, userProfileUpdateRequest);
+        userProfileService.updateUserProfile(principal, userProfileUpdateRequest);
         return ResponseEntity.ok(new ApiResponse(true, "Profile updated successfully", userProfileUpdateRequest));
     }
 
     @PostMapping("/profile-image")
     public ResponseEntity<ApiResponse> updateProfileImage(@RequestParam("image") MultipartFile file, Principal principal) {
         try {
-            Long userId = getUserIdFromPrincipal(principal);
-            String fileName = userProfileService.updateProfileImage(userId,file);
+            String fileName = userProfileService.updateProfileImage(principal,file);
 
             return ResponseEntity.ok(new ApiResponse(true, "Image uploaded successfully",  new HashMap<>(){{
-                put("file",fileName);
+                put("file",file);
             }}));
         } catch (IOException e) {
             return ResponseEntity.status(500).body(new ApiResponse(false, "Image upload failed: " + e.getMessage(), null));

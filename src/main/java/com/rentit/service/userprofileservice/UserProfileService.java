@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.security.Principal;
 
 @Service
 @RequiredArgsConstructor
@@ -26,9 +27,14 @@ public class UserProfileService {
 
     private final ProfileImageRepository profileImageRepository;
 
-    public void updateUserProfile(Long userId, UserProfileUpdateRequest userProfileUpdateRequest) {
-        UserEntity userEntity = userRepository.findById(userId).
+    private UserEntity getUserFromPrincipal(Principal principal) {
+        String email = principal.getName();
+        return userRepository.findByEmail(email).
                 orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
+    public void updateUserProfile(Principal principal, UserProfileUpdateRequest userProfileUpdateRequest) {
+        UserEntity userEntity = getUserFromPrincipal(principal);
 
         UserProfileEntity userProfile = userEntity.getProfile();
         if(userProfile == null) {
@@ -47,9 +53,8 @@ public class UserProfileService {
         userRepository.save(userEntity);
     }
 
-    public String updateProfileImage(long userId, MultipartFile file) throws IOException {
-        UserEntity userEntity = userRepository.findById(userId).
-                orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    public String updateProfileImage(Principal principal, MultipartFile file) throws IOException {
+        UserEntity userEntity = getUserFromPrincipal(principal);
 
         String fileName = fileService.uploadImage(file);
 
