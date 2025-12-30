@@ -1,6 +1,5 @@
 package com.rentit.controller.postcontroller;
 
-import com.rentit.entity.user.UserEntity;
 import com.rentit.payload.request.post.RoomListingRequest;
 import com.rentit.payload.request.post.RoommateListingRequest;
 import com.rentit.payload.response.ApiResponse;
@@ -9,7 +8,6 @@ import com.rentit.service.postservice.ListingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -19,7 +17,6 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.HashMap;
 import java.util.List;
 
 @RestController

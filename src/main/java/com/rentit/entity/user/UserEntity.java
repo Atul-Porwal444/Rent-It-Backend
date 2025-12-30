@@ -1,7 +1,10 @@
 package com.rentit.entity.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.rentit.entity.post.RoomListing;
 import com.rentit.entity.post.RoommateListing;
+import com.rentit.entity.saved.SavedRoomPost;
+import com.rentit.entity.saved.SavedRoommatePost;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -38,4 +41,12 @@ public class UserEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<RoommateListing> roommateListings = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<SavedRoomPost> savedRoomPostss = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade =  CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<SavedRoommatePost> savedRoommatePosts = new ArrayList<>();
 }
