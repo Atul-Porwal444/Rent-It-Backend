@@ -2,8 +2,6 @@ package com.rentit.payload.request.post;
 
 import lombok.Data;
 
-import java.util.List;
-
 
 @Data
 public abstract class BaseListingRequest {

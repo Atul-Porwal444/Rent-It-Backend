@@ -1,13 +1,11 @@
 package com.rentit.controller.usercontroller;
 
-import com.rentit.entity.user.UserEntity;
 import com.rentit.payload.request.user.UserProfileUpdateRequest;
 import com.rentit.payload.response.ApiResponse;
 import com.rentit.repository.user.UserRepository;
 import com.rentit.service.userprofileservice.UserProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
