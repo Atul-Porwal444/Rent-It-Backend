@@ -5,13 +5,13 @@ import com.rentit.entity.post.RoommateListing;
 import com.rentit.entity.saved.SavedRoomPost;
 import com.rentit.entity.saved.SavedRoommatePost;
 import com.rentit.entity.user.UserEntity;
+import com.rentit.exception.ResourceNotFoundException;
 import com.rentit.repository.post.RoomListingRepository;
 import com.rentit.repository.post.RoommateListingRepository;
 import com.rentit.repository.saved.SavedRoomPostRepository;
 import com.rentit.repository.saved.SavedRoommatePostRepository;
 import com.rentit.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
@@ -33,22 +33,20 @@ public class SavedPostService {
 
     private UserEntity getUserFromPrincipal(Principal principal) {
         return userRepository.findByEmail(principal.getName())
-                .orElseThrow(() -> new UsernameNotFoundException("Username not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Username not found"));
     }
 
     public void toggleSavedRoom(Principal principal, Long postId) {
         UserEntity user = getUserFromPrincipal(principal);
         RoomListing room = roomListingRepository.findById(postId).orElseThrow(() ->
-                new RuntimeException("Room post Not Found"));
+                new ResourceNotFoundException("Room post Not Found"));
 
         Optional<SavedRoomPost> existing = savedRoomPostRepository.findByUserAndRoomListing(user,room);
 
         if(existing.isPresent()) {
-            System.out.println("Removing from saved");
             savedRoomPostRepository.delete(existing.get());
         }
         else  {
-            System.out.println("Adding to saved");
             SavedRoomPost savedRoomPost = new SavedRoomPost();
             savedRoomPost.setUser(user);
             savedRoomPost.setRoomListing(room);
@@ -59,16 +57,14 @@ public class SavedPostService {
     public void toggleSavedRoommate(Principal principal, Long postId) {
         UserEntity user = getUserFromPrincipal(principal);
         RoommateListing roommate = roommateListingRepository.findById(postId).orElseThrow(() ->
-                new RuntimeException("Roommate post Not Found"));
+                new ResourceNotFoundException("Roommate post Not Found"));
 
         Optional<SavedRoommatePost> existing = savedRoommatePostRepository.findByUserAndRoommateListing(user,roommate);
 
         if(existing.isPresent()) {
-            System.out.println("Removing from saved");
             savedRoommatePostRepository.delete(existing.get());
         }
         else {
-            System.out.println("Adding to saved");
             SavedRoommatePost savedRoommatePost = new SavedRoommatePost();
             savedRoommatePost.setUser(user);
             savedRoommatePost.setRoommateListing(roommate);

@@ -24,7 +24,7 @@ public class SavedPostController {
 
             savedPostService.toggleSavedRoom(principal, postId);
 
-            return ResponseEntity.ok(new ApiResponse(true, "Toggled room post Successfull", null));
+            return ResponseEntity.ok(new ApiResponse(true, "Toggled room post Successfully", null));
 
         } catch (Exception e) {
             return ResponseEntity.status(500).body(new ApiResponse(false, "Internal Server Error: " + e.getMessage(), null));
@@ -37,7 +37,7 @@ public class SavedPostController {
 
             savedPostService.toggleSavedRoommate(principal, postId);
 
-            return ResponseEntity.ok(new ApiResponse(true, "Toggled roommate post Successfull", null));
+            return ResponseEntity.ok(new ApiResponse(true, "Toggled roommate post Successfully", null));
 
         } catch (Exception e) {
             return ResponseEntity.status(500).body(new ApiResponse(false, "Internal Server Error: " + e.getMessage(), null));

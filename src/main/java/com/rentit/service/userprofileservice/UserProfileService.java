@@ -3,13 +3,13 @@ package com.rentit.service.userprofileservice;
 import com.rentit.entity.user.ProfileImage;
 import com.rentit.entity.user.UserEntity;
 import com.rentit.entity.user.UserProfileEntity;
+import com.rentit.exception.ResourceNotFoundException;
 import com.rentit.payload.request.user.UserProfileUpdateRequest;
 import com.rentit.repository.user.ProfileImageRepository;
 import com.rentit.repository.user.UserProfileRepository;
 import com.rentit.repository.user.UserRepository;
 import com.rentit.service.media.ImageStorageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,7 +31,7 @@ public class UserProfileService {
     private UserEntity getUserFromPrincipal(Principal principal) {
         String email = principal.getName();
         return userRepository.findByEmail(email).
-                orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     public void updateUserProfile(Principal principal, UserProfileUpdateRequest userProfileUpdateRequest) {

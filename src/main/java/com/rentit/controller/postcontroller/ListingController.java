@@ -1,5 +1,6 @@
 package com.rentit.controller.postcontroller;
 
+import com.rentit.exception.ResourceNotFoundException;
 import com.rentit.payload.request.post.RoomListingRequest;
 import com.rentit.payload.request.post.RoommateListingRequest;
 import com.rentit.payload.response.ApiResponse;
@@ -41,7 +42,7 @@ public class ListingController {
 
             return ResponseEntity.ok(new ApiResponse(true, "Post successfully",  roomListingRequest));
 
-        } catch (Exception e) {
+        } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(500).body(new ApiResponse(false, "Post unsuccessful" + e.getMessage(), null));
         }
     }
@@ -56,7 +57,7 @@ public class ListingController {
 
             return ResponseEntity.ok(new ApiResponse(true, "Post successfully",  roommateListingRequest));
 
-        } catch (Exception e) {
+        } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(500).body(new ApiResponse(false, "Post unsuccessful" + e.getMessage(), null));
         }
     }

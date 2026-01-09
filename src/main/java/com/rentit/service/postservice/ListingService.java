@@ -4,6 +4,7 @@ import com.rentit.entity.post.BaseListing;
 import com.rentit.entity.post.RoomListing;
 import com.rentit.entity.post.RoommateListing;
 import com.rentit.entity.user.UserEntity;
+import com.rentit.exception.ResourceNotFoundException;
 import com.rentit.payload.request.post.BaseListingRequest;
 import com.rentit.payload.request.post.RoomListingRequest;
 import com.rentit.payload.request.post.RoommateListingRequest;
@@ -13,7 +14,6 @@ import com.rentit.repository.user.UserRepository;
 import com.rentit.service.media.ImageStorageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,7 +37,7 @@ public class ListingService {
     private UserEntity getUserFromPrincipal(Principal principal) {
         String email = principal.getName();
         return userRepository.findByEmail(email).
-                orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     @Transactional
