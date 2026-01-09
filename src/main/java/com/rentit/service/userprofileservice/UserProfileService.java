@@ -7,6 +7,7 @@ import com.rentit.payload.request.user.UserProfileUpdateRequest;
 import com.rentit.repository.user.ProfileImageRepository;
 import com.rentit.repository.user.UserProfileRepository;
 import com.rentit.repository.user.UserRepository;
+import com.rentit.service.media.ImageStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -21,9 +22,9 @@ public class UserProfileService {
 
     private final UserRepository userRepository;
 
-    private final UserProfileRepository userProfileRepository;
+    private final ImageStorageService imageStorageService;
 
-    private final FileService fileService;
+    private final UserProfileRepository userProfileRepository;
 
     private final ProfileImageRepository profileImageRepository;
 
@@ -56,17 +57,17 @@ public class UserProfileService {
     public String updateProfileImage(Principal principal, MultipartFile file) throws IOException {
         UserEntity userEntity = getUserFromPrincipal(principal);
 
-        String fileName = fileService.uploadImage(file);
+        String publicUrl = imageStorageService.uploadImage(file);
 
-        ProfileImage  profileImage = userEntity.getProfileImage();
+        ProfileImage profileImage = userEntity.getProfileImage();
         if(profileImage == null) {
             profileImage = new ProfileImage();
             profileImage.setUser(userEntity);
         }
-        profileImage.setImageUrl(fileName);
+        profileImage.setImageUrl(publicUrl);
 
         profileImageRepository.save(profileImage);
 
-        return fileName;
+        return publicUrl;
     }
 }

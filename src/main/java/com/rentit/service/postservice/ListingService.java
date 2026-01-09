@@ -10,7 +10,7 @@ import com.rentit.payload.request.post.RoommateListingRequest;
 import com.rentit.repository.post.RoomListingRepository;
 import com.rentit.repository.post.RoommateListingRepository;
 import com.rentit.repository.user.UserRepository;
-import com.rentit.service.userprofileservice.FileService;
+import com.rentit.service.media.ImageStorageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -26,9 +26,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ListingService {
 
-    private final FileService fileService;
-
     private final UserRepository userRepository;
+
+    private final ImageStorageService imageStorageService;
 
     private final RoomListingRepository roomListingRepository;
 
@@ -53,8 +53,8 @@ public class ListingService {
 
         List<String> imageUrls = new ArrayList<>();
         for(MultipartFile file : images) {
-            String fileName = fileService.uploadImage(file);
-            imageUrls.add(fileName);
+            String pubicUrl = imageStorageService.uploadImage(file);
+            imageUrls.add(pubicUrl);
         }
 
         room.setImageUrls(imageUrls);
@@ -79,8 +79,8 @@ public class ListingService {
 
         List<String> imageUrls = new ArrayList<>();
         for(MultipartFile file : images) {
-            String fileName = fileService.uploadImage(file);
-            imageUrls.add(fileName);
+            String publicUrl = imageStorageService.uploadImage(file);
+            imageUrls.add(publicUrl);
         }
 
         roommatePost.setImageUrls(imageUrls);

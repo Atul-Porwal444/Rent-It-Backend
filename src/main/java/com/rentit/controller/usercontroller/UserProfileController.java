@@ -32,10 +32,10 @@ public class UserProfileController {
     @PostMapping("/profile-image")
     public ResponseEntity<ApiResponse> updateProfileImage(@RequestParam("image") MultipartFile file, Principal principal) {
         try {
-            String fileName = userProfileService.updateProfileImage(principal,file);
+            String publicUrl = userProfileService.updateProfileImage(principal,file);
 
             return ResponseEntity.ok(new ApiResponse(true, "Image uploaded successfully",  new HashMap<>(){{
-                put("file",file);
+                put("url",publicUrl);
             }}));
         } catch (IOException e) {
             return ResponseEntity.status(500).body(new ApiResponse(false, "Image upload failed: " + e.getMessage(), null));
