@@ -125,6 +125,7 @@
                 </configuration>
             </plugin>
         </plugins>
+        <finalName>rentit</finalName>
     </build>
 
 </project>
