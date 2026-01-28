@@ -30,6 +30,9 @@ public class UserEntity {
     @Column(nullable = false)
     private String password;
 
+    @Column(name = "is_verified", nullable = false)
+    private boolean isVerified = false;
+
     @OneToOne(mappedBy = "user",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private UserProfileEntity profile;
 
