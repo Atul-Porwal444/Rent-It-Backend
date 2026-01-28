@@ -89,4 +89,11 @@ public class AuthService {
             throw new RuntimeException("Invalid credentials");
         }
     }
+
+    public boolean isAccountVerified(String email) {
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User with this email not found"));
+
+        return user.isVerified();
+    }
 }

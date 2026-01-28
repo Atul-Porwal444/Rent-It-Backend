@@ -39,6 +39,15 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse> login(@RequestBody LoginRequest request) {
+
+        if(!authService.isAccountVerified(request.getEmail())) {
+            return ResponseEntity.status(403).body(new ApiResponse(
+                    false,
+                    "Unverified account",
+                    null
+            ));
+        }
+
         try {
             String token = authService.loginUser(request);
             // Return 200 OK with the Token data
