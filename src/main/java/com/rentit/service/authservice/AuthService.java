@@ -5,6 +5,7 @@ import com.rentit.entity.user.UserEntity;
 import com.rentit.exception.ResourceNotFoundException;
 import com.rentit.payload.request.auth.LoginRequest;
 import com.rentit.payload.request.auth.SignupRequest;
+import com.rentit.payload.request.auth.VerificationRequest;
 import com.rentit.repository.auth.VerificationTokenRepository;
 import com.rentit.repository.user.UserRepository;
 import com.rentit.service.EmailService;
@@ -60,13 +61,13 @@ public class AuthService {
         emailService.sendVerificationEmail(signupRequest.getEmail(), otp);
     }
 
-    public boolean verifyUser(String email, String otp) {
-        UserEntity user = userRepository.findByEmail(email)
+    public boolean verifyUser(VerificationRequest request) {
+        UserEntity user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("User with this email not found"));
 
         VerificationToken token = verificationTokenRepository.findByUser(user);
 
-        if(token.getOtp().equals(otp) && token.getExpiryDate().isAfter(LocalDateTime.now())) {
+        if(token.getOtp().equals(request.getOtp()) && token.getExpiryDate().isAfter(LocalDateTime.now())) {
             user.setVerified(true);
             userRepository.save(user);
 

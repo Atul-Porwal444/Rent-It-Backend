@@ -2,15 +2,13 @@ package com.rentit.controller.authcontroller;
 
 import com.rentit.payload.request.auth.LoginRequest;
 import com.rentit.payload.request.auth.SignupRequest;
+import com.rentit.payload.request.auth.VerificationRequest;
 import com.rentit.payload.response.ApiResponse;
 import com.rentit.service.authservice.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 
@@ -35,6 +33,16 @@ public class AuthController {
                     HttpStatus.BAD_REQUEST
             );
         }
+    }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<ApiResponse> verifyUser(@RequestBody VerificationRequest verificationRequest) {
+        if(this.authService.verifyUser(verificationRequest)){
+            return ResponseEntity.ok(new ApiResponse(true, "User verified successfully", null));
+        }
+        return new ResponseEntity<>(
+                new ApiResponse(false, "Otp is Invalid or Expired", null),
+                HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping("/login")
