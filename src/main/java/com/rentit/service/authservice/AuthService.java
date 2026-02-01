@@ -78,6 +78,29 @@ public class AuthService {
         return false;
     }
 
+    public void resendOtp(String email) {
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if(user.isVerified()) {
+            throw new RuntimeException("User is already verified");
+        }
+
+        String otp = String.valueOf(new Random().nextInt(900000)+100000);
+
+        VerificationToken token = verificationTokenRepository.findByUser(user);
+        if(token == null) {
+            token = new VerificationToken();
+            token.setUser(user);
+        }
+
+        token.setOtp(otp);
+        token.setExpiryDate(LocalDateTime.now().plusMinutes(10));
+        verificationTokenRepository.save(token);
+
+        emailService.sendVerificationEmail(email, otp);
+    }
+
     public String loginUser(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())

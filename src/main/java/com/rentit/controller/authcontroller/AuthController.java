@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -43,6 +44,19 @@ public class AuthController {
         return new ResponseEntity<>(
                 new ApiResponse(false, "Otp is Invalid or Expired", null),
                 HttpStatus.BAD_REQUEST);
+    }
+
+    @PostMapping("/resend-otp")
+    public ResponseEntity<?> resendOtp(@RequestBody Map<String, String> request) {
+        String email =  request.get("email");
+
+        if(email == null || email.isEmpty()){
+            return ResponseEntity.badRequest().body(Map.of("message", "Email is required"));
+        }
+
+        this.authService.resendOtp(email);
+
+        return ResponseEntity.ok(Map.of("message", "OTP resent successfully"));
     }
 
     @PostMapping("/login")
