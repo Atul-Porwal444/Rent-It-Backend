@@ -19,7 +19,7 @@ public class UserProfileEntity {
 
     private String location;
 
-    private LocalDate dob;
+    private String dob;
 
     private String phoneNumber;
 

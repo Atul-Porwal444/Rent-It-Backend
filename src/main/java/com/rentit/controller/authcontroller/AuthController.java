@@ -1,9 +1,13 @@
 package com.rentit.controller.authcontroller;
 
+import com.rentit.entity.user.UserEntity;
+import com.rentit.exception.ResourceNotFoundException;
 import com.rentit.payload.request.auth.LoginRequest;
 import com.rentit.payload.request.auth.SignupRequest;
 import com.rentit.payload.request.auth.VerificationRequest;
 import com.rentit.payload.response.ApiResponse;
+import com.rentit.payload.response.LoginResponse;
+import com.rentit.repository.user.UserRepository;
 import com.rentit.service.authservice.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +23,7 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
+    private final UserRepository userRepository;
 
     @PostMapping("signup")
     public ResponseEntity<ApiResponse> signupUser(@RequestBody SignupRequest signupRequest) {
@@ -72,11 +77,19 @@ public class AuthController {
 
         try {
             String token = authService.loginUser(request);
+
+            UserEntity user = userRepository.findByEmail(request.getEmail())
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+            LoginResponse response = new LoginResponse();
+            response.setId(user.getId());
+            response.setToken(token);
+            response.setName(user.getName());
+            response.setEmail(user.getEmail());
+            response.setProfileUrl(user.getProfileImage().getImageUrl());
             // Return 200 OK with the Token data
             return ResponseEntity.ok(
-                    new ApiResponse(true, "Login Successful", new HashMap<>(){{
-                        put("token", token);
-                    }})
+                    new ApiResponse(true, "Login Successful", response)
             );
         } catch (RuntimeException e) {
             // Return 401 UNAUTHORIZED for bad password

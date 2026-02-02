@@ -1,7 +1,9 @@
 package com.rentit.service.authservice;
 
 import com.rentit.entity.auth.VerificationToken;
+import com.rentit.entity.user.ProfileImage;
 import com.rentit.entity.user.UserEntity;
+import com.rentit.entity.user.UserProfileEntity;
 import com.rentit.exception.ResourceNotFoundException;
 import com.rentit.payload.request.auth.LoginRequest;
 import com.rentit.payload.request.auth.SignupRequest;
@@ -36,6 +38,8 @@ public class AuthService {
 
     private final VerificationTokenRepository verificationTokenRepository;
 
+    private final String DEFAULT_AVATAR = "https://ui-avatars.com/api/?background=random&name=User";
+
     public void registerUser(SignupRequest signupRequest) {
         if(userRepository.findByEmail(signupRequest.getEmail()).isPresent()){
             throw new RuntimeException("Email Already Exists");
@@ -46,6 +50,21 @@ public class AuthService {
         userEntity.setEmail(signupRequest.getEmail());
         userEntity.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
         userEntity.setVerified(false);
+
+        UserProfileEntity userProfileEntity = new UserProfileEntity();
+        userProfileEntity.setLocation("");
+        userProfileEntity.setDob("");
+        userProfileEntity.setPhoneNumber("");
+        userProfileEntity.setGender("");
+        userProfileEntity.setOccupation("");
+        userProfileEntity.setAbout("");
+        userProfileEntity.setUser(userEntity);
+        userEntity.setProfile(userProfileEntity);
+
+        ProfileImage profileImage = new ProfileImage();
+        profileImage.setImageUrl(DEFAULT_AVATAR);
+        profileImage.setUser(userEntity);
+        userEntity.setProfileImage(profileImage);
 
         userRepository.save(userEntity);
 
