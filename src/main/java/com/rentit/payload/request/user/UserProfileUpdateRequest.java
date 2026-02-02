@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class UserProfileUpdateRequest {
     private String location;
-    private LocalDate dob;
+    private String dob;
     private String phoneNumber;
     private String gender;
     private String occupation;

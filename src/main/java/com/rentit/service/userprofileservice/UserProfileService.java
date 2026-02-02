@@ -44,7 +44,7 @@ public class UserProfileService {
         }
 
         userProfile.setLocation(userProfileUpdateRequest.getLocation());
-        userProfile.setDob(userProfileUpdateRequest.getDob());
+        userProfile.setDob(String.valueOf(userProfileUpdateRequest.getDob()));
         userProfile.setPhoneNumber(userProfileUpdateRequest.getPhoneNumber());
         userProfile.setGender(userProfileUpdateRequest.getGender());
         userProfile.setOccupation(userProfileUpdateRequest.getOccupation());
