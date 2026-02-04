@@ -38,7 +38,7 @@ public class AuthService {
 
     private final VerificationTokenRepository verificationTokenRepository;
 
-    private final String DEFAULT_AVATAR = "https://ui-avatars.com/api/?background=random&name=User";
+    private final String DEFAULT_AVATAR = "https://ui-avatars.com/api/?background=random&name=";
 
     public void registerUser(SignupRequest signupRequest) {
         if(userRepository.findByEmail(signupRequest.getEmail()).isPresent()){
@@ -54,15 +54,15 @@ public class AuthService {
         UserProfileEntity userProfileEntity = new UserProfileEntity();
         userProfileEntity.setLocation("");
         userProfileEntity.setDob("");
-        userProfileEntity.setPhoneNumber("");
+        userProfileEntity.setPhone("");
         userProfileEntity.setGender("");
         userProfileEntity.setOccupation("");
-        userProfileEntity.setAbout("");
+        userProfileEntity.setBio("");
         userProfileEntity.setUser(userEntity);
         userEntity.setProfile(userProfileEntity);
 
         ProfileImage profileImage = new ProfileImage();
-        profileImage.setImageUrl(DEFAULT_AVATAR);
+        profileImage.setImageUrl(DEFAULT_AVATAR + signupRequest.getName());
         profileImage.setUser(userEntity);
         userEntity.setProfileImage(profileImage);
 

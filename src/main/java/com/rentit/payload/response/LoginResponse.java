@@ -13,4 +13,10 @@ public class LoginResponse {
     private String name;
     private String email;
     private String profileUrl;
+    private String location;
+    private String gender;
+    private String occupation;
+    private String bio;
+    private String dob;
+    private String phone;
 }

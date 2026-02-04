@@ -10,10 +10,11 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserProfileUpdateRequest {
+    private String name;
     private String location;
     private String dob;
-    private String phoneNumber;
+    private String phone;
     private String gender;
     private String occupation;
-    private String about;
+    private String bio;
 }

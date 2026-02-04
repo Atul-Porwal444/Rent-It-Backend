@@ -1,5 +1,6 @@
 package com.rentit.controller.usercontroller;
 
+import com.rentit.payload.request.user.PasswordChangeRequest;
 import com.rentit.payload.request.user.UserProfileUpdateRequest;
 import com.rentit.payload.response.ApiResponse;
 import com.rentit.repository.user.UserRepository;
@@ -24,7 +25,6 @@ public class UserProfileController {
 
     @PutMapping("/profile")
     public ResponseEntity<ApiResponse> updateUserProfile(@RequestBody UserProfileUpdateRequest userProfileUpdateRequest, Principal principal) {
-        System.out.println("Enter in controller");
         userProfileService.updateUserProfile(principal, userProfileUpdateRequest);
         return ResponseEntity.ok(new ApiResponse(true, "Profile updated successfully", userProfileUpdateRequest));
     }
@@ -40,6 +40,12 @@ public class UserProfileController {
         } catch (IOException e) {
             return ResponseEntity.status(500).body(new ApiResponse(false, "Image upload failed: " + e.getMessage(), null));
         }
+    }
+
+    @PostMapping("/password")
+    public ResponseEntity<ApiResponse> changePassword(@RequestBody PasswordChangeRequest passwordChangeRequest, Principal principal) {
+        userProfileService.changePassword(passwordChangeRequest, principal);
+        return ResponseEntity.ok(new ApiResponse(true, "Password changed successfully", passwordChangeRequest));
     }
 
 }

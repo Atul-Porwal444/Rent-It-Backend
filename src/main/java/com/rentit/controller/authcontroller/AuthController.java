@@ -1,6 +1,7 @@
 package com.rentit.controller.authcontroller;
 
 import com.rentit.entity.user.UserEntity;
+import com.rentit.entity.user.UserProfileEntity;
 import com.rentit.exception.ResourceNotFoundException;
 import com.rentit.payload.request.auth.LoginRequest;
 import com.rentit.payload.request.auth.SignupRequest;
@@ -14,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -81,12 +81,7 @@ public class AuthController {
             UserEntity user = userRepository.findByEmail(request.getEmail())
                     .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-            LoginResponse response = new LoginResponse();
-            response.setId(user.getId());
-            response.setToken(token);
-            response.setName(user.getName());
-            response.setEmail(user.getEmail());
-            response.setProfileUrl(user.getProfileImage().getImageUrl());
+            final LoginResponse response = getLoginResponse(user, token);
             // Return 200 OK with the Token data
             return ResponseEntity.ok(
                     new ApiResponse(true, "Login Successful", response)
@@ -98,5 +93,23 @@ public class AuthController {
                     HttpStatus.UNAUTHORIZED
             );
         }
+    }
+
+    private static LoginResponse getLoginResponse(UserEntity user, String token) {
+        UserProfileEntity profile = user.getProfile();
+
+        LoginResponse response = new LoginResponse();
+        response.setId(user.getId());
+        response.setToken(token);
+        response.setName(user.getName());
+        response.setEmail(user.getEmail());
+        response.setProfileUrl(user.getProfileImage().getImageUrl());
+        response.setLocation(profile.getLocation());
+        response.setDob(profile.getDob());
+        response.setPhone(profile.getPhone());
+        response.setGender(profile.getGender());
+        response.setOccupation(profile.getOccupation());
+        response.setBio(profile.getBio());
+        return response;
     }
 }

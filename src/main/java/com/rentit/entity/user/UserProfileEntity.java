@@ -19,14 +19,13 @@ public class UserProfileEntity {
 
     private String dob;
 
-    private String phoneNumber;
+    private String phone;
 
     private String gender;
 
     private String occupation;
 
-    @Column(length = 1000)
-    private String about;
+    private String bio;
 
 
     @OneToOne(fetch = FetchType.LAZY)
