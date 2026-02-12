@@ -12,6 +12,7 @@ import com.rentit.repository.auth.VerificationTokenRepository;
 import com.rentit.repository.user.UserRepository;
 import com.rentit.service.EmailService;
 import com.rentit.utility.JwtUtil;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -40,6 +41,7 @@ public class AuthService {
 
     private final String DEFAULT_AVATAR = "https://ui-avatars.com/api/?background=random&name=";
 
+    @Transactional
     public void registerUser(SignupRequest signupRequest) {
         if(userRepository.findByEmail(signupRequest.getEmail()).isPresent()){
             throw new RuntimeException("Email Already Exists");

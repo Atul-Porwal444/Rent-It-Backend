@@ -41,7 +41,9 @@ public class UserProfileService {
     public void changePassword(PasswordChangeRequest passwordChangeRequest, Principal principal) {
         UserEntity user = getUserFromPrincipal(principal);
 
-        if(!user.getPassword().equals(passwordEncoder.encode(passwordChangeRequest.getOldPassword()))) {
+        System.out.println(user.getPassword() + " " + passwordEncoder.encode(passwordChangeRequest.getOldPassword()));
+
+        if(!passwordEncoder.matches(passwordChangeRequest.getOldPassword(), user.getPassword())) {
             throw new RuntimeException("Old password does not match");
         }
 

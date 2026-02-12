@@ -52,7 +52,9 @@ public class UserProfileController {
         return ResponseEntity.ok(new ApiResponse(true, "Password changed successfully", passwordChangeRequest));
     }
 
+    @DeleteMapping("/delete-account")
     public ResponseEntity<ApiResponse> deleteAccount(Principal principal) {
+        this.userProfileService.deleteAccount(principal);
         return ResponseEntity.ok(new ApiResponse(true, "Account deleted successfully", null));
     }
 
