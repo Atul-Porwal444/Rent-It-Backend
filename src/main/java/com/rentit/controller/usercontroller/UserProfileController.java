@@ -44,8 +44,16 @@ public class UserProfileController {
 
     @PostMapping("/password")
     public ResponseEntity<ApiResponse> changePassword(@RequestBody PasswordChangeRequest passwordChangeRequest, Principal principal) {
-        userProfileService.changePassword(passwordChangeRequest, principal);
+        try {
+            userProfileService.changePassword(passwordChangeRequest, principal);
+        } catch (Exception e) {
+            return ResponseEntity.status(422).body(new ApiResponse(false, "Password change failed: " + e.getMessage(), null));
+        }
         return ResponseEntity.ok(new ApiResponse(true, "Password changed successfully", passwordChangeRequest));
+    }
+
+    public ResponseEntity<ApiResponse> deleteAccount(Principal principal) {
+        return ResponseEntity.ok(new ApiResponse(true, "Account deleted successfully", null));
     }
 
 }

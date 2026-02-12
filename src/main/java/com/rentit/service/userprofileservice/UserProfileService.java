@@ -41,13 +41,23 @@ public class UserProfileService {
     public void changePassword(PasswordChangeRequest passwordChangeRequest, Principal principal) {
         UserEntity user = getUserFromPrincipal(principal);
 
+        if(!user.getPassword().equals(passwordEncoder.encode(passwordChangeRequest.getOldPassword()))) {
+            throw new RuntimeException("Old password does not match");
+        }
+
         user.setPassword(passwordEncoder.encode(passwordChangeRequest.getNewPassword()));
 
         userRepository.save(user);
     }
 
+    public void deleteAccount(Principal principal) {
+        UserEntity user = getUserFromPrincipal(principal);
+        userRepository.delete(user);
+    }
+
 
     public void updateUserProfile(Principal principal, UserProfileUpdateRequest request) {
+        System.out.println(request.getDob());
         
         UserEntity user = getUserFromPrincipal(principal);
         
@@ -59,11 +69,11 @@ public class UserProfileService {
             profile.setUser(user);
         }
 
-        if(request.getGender() != null && !request.getGender().isEmpty()) profile.setGender(request.getGender());
-        if(request.getPhone()!= null && !request.getPhone().isEmpty()) profile.setPhone(request.getPhone());
-        if(request.getOccupation() != null && !request.getOccupation().isEmpty()) profile.setOccupation(request.getOccupation());
         if(request.getBio() != null && !request.getBio().isEmpty()) profile.setBio(request.getBio());
-
+        if(request.getPhone()!= null && !request.getPhone().isEmpty()) profile.setPhone(request.getPhone());
+        if(request.getGender() != null && !request.getGender().isEmpty()) profile.setGender(request.getGender());
+        if(request.getLocation() != null && !request.getLocation().isEmpty()) profile.setLocation(request.getLocation());
+        if(request.getOccupation() != null && !request.getOccupation().isEmpty()) profile.setOccupation(request.getOccupation());
         if(request.getDob() != null && !request.getDob().isEmpty()) profile.setDob(request.getDob());
         
         user.setProfile(profile);
