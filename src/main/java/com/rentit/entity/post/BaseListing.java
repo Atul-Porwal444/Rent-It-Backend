@@ -25,6 +25,11 @@ public abstract class BaseListing {
 
     private String location;
     private String city;
+    private String state;
+
+    @Column(length = 6)
+    private String pincode;
+
     private String description;
 
     private String bhkType;

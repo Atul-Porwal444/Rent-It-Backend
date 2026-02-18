@@ -92,6 +92,8 @@ public class ListingService {
     private void mapBaseFields(BaseListingRequest request, BaseListing listing) {
         listing.setLocation(request.getLocation());
         listing.setCity(request.getCity());
+        listing.setState(request.getState());
+        listing.setPincode(request.getPincode());
         listing.setDescription(request.getDescription());
         listing.setBhkType(request.getBhkType());
         listing.setFloorNumber(request.getFloorNumber());

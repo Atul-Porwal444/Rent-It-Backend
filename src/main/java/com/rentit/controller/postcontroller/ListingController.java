@@ -36,7 +36,7 @@ public class ListingController {
     public ResponseEntity<ApiResponse> createRoomListing(@RequestPart("data") String jsonListing, @RequestPart("images")List<MultipartFile> files, Principal principal) throws IOException {
         try {
 
-            RoomListingRequest  roomListingRequest = objectMapper.readValue(jsonListing, RoomListingRequest.class);
+            RoomListingRequest roomListingRequest = objectMapper.readValue(jsonListing, RoomListingRequest.class);
 
             listingService.createRoomListing(principal, roomListingRequest, files);
 
