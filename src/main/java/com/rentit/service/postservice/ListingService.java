@@ -8,6 +8,7 @@ import com.rentit.exception.ResourceNotFoundException;
 import com.rentit.payload.request.post.BaseListingRequest;
 import com.rentit.payload.request.post.RoomListingRequest;
 import com.rentit.payload.request.post.RoommateListingRequest;
+import com.rentit.payload.response.PagedResponse;
 import com.rentit.repository.post.RoomListingRepository;
 import com.rentit.repository.post.RoommateListingRepository;
 import com.rentit.repository.user.UserRepository;
