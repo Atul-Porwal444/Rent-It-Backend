@@ -47,6 +47,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.PAYLOAD_TOO_LARGE);
     }
 
+    //HANDLE ALL THE POSSIBLE UNKNOWN EXCEPTION
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex, HttpServletRequest request) {
         // Logging to see the actual error for the future references

@@ -1,18 +1,20 @@
 package com.rentit.controller.postcontroller;
 
+import com.rentit.exception.BadRequestException;
 import com.rentit.exception.ResourceNotFoundException;
 import com.rentit.payload.request.post.RoomListingRequest;
 import com.rentit.payload.request.post.RoommateListingRequest;
 import com.rentit.payload.response.ApiResponse;
+import com.rentit.payload.response.PagedResponse;
+import com.rentit.payload.response.post.RoomListingDto;
+import com.rentit.payload.response.post.RoommateListingDto;
 import com.rentit.repository.user.UserRepository;
 import com.rentit.service.postservice.ListingService;
+import com.rentit.utility.AppConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import tools.jackson.databind.ObjectMapper;
 
@@ -60,6 +62,31 @@ public class ListingController {
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(500).body(new ApiResponse(false, "Post unsuccessful" + e.getMessage(), null));
         }
+    }
+
+    @GetMapping("/rooms")
+    public ResponseEntity<PagedResponse<RoomListingDto>> getRooms(
+            @RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNo,
+            @RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+            @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir
+    ) {
+        // Validation constraint check
+        if (pageNo < 0) throw new BadRequestException("Page index must not be less than zero");
+
+        return ResponseEntity.ok(listingService.getAllRooms(pageNo, pageSize, sortBy, sortDir));
+    }
+
+    @GetMapping("/roommates")
+    public ResponseEntity<PagedResponse<RoommateListingDto>> getRoommates(
+            @RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNo,
+            @RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+            @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir
+    ) {
+        if (pageNo < 0) throw new BadRequestException("Page index must not be less than zero");
+
+        return ResponseEntity.ok(listingService.getAllRoommates(pageNo, pageSize, sortBy, sortDir));
     }
 
 }

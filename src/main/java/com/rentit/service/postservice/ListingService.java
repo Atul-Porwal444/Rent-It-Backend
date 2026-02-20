@@ -9,12 +9,19 @@ import com.rentit.payload.request.post.BaseListingRequest;
 import com.rentit.payload.request.post.RoomListingRequest;
 import com.rentit.payload.request.post.RoommateListingRequest;
 import com.rentit.payload.response.PagedResponse;
+import com.rentit.payload.response.post.BaseListingDto;
+import com.rentit.payload.response.post.RoomListingDto;
+import com.rentit.payload.response.post.RoommateListingDto;
 import com.rentit.repository.post.RoomListingRepository;
 import com.rentit.repository.post.RoommateListingRepository;
 import com.rentit.repository.user.UserRepository;
 import com.rentit.service.media.ImageStorageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +29,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -103,6 +111,124 @@ public class ListingService {
         listing.setWaterSupply24x7(request.isWaterSupply24x7());
         listing.setElectricityBackup(request.isElectricityBackup());
         listing.setRentAmount(request.getRentAmount());
+    }
+
+    public PagedResponse<RoomListingDto> getAllRooms(int pageNo, int pageSize, String sortBy, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        // Create Pageable instance
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+
+        // Fetch paginated data from DB
+        Page<RoomListing> roomPage = roomListingRepository.findAll(pageable);
+
+        // Map Entities to DTOs
+        List<RoomListingDto> content = roomPage.getContent().stream()
+                .map(this::mapToRoomDto)
+                .collect(Collectors.toList());
+
+        // Return Standard Wrapper
+        return new PagedResponse<>(
+                content,
+                roomPage.getNumber(),
+                roomPage.getSize(),
+                roomPage.getTotalElements(),
+                roomPage.getTotalPages(),
+                roomPage.isLast()
+        );
+
+    }
+
+    public PagedResponse<RoommateListingDto> getAllRoommates(int pageNo, int pageSize, String sortBy, String sortDir) {
+
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+
+        Page<RoommateListing> roommatePage = roommateListingRepository.findAll(pageable);
+
+        List<RoommateListingDto> content = roommatePage.getContent().stream()
+                .map(this::mapToRoommateDto)
+                .collect(Collectors.toList());
+
+        return new PagedResponse<>(
+                content,
+                roommatePage.getNumber(),
+                roommatePage.getSize(),
+                roommatePage.getTotalElements(),
+                roommatePage.getTotalPages(),
+                roommatePage.isLast()
+        );
+    }
+
+    private RoomListingDto mapToRoomDto(RoomListing entity) {
+        RoomListingDto dto = new RoomListingDto();
+
+        // 1. Map all common Base properties
+        mapBaseListingFields(entity, dto);
+
+        if (entity.getUser() != null) {
+            dto.setUserId(entity.getUser().getId());
+            dto.setUserName(entity.getUser().getName());
+
+            if(entity.getUser().getProfileImage() != null) {
+                dto.setUserProfileImageUrl(entity.getUser().getProfileImage().getImageUrl());
+            }
+        }
+
+        // 2. Map Room specific properties
+        dto.setSecurityDeposit(entity.getSecurityDeposit());
+        dto.setAvailabilityStatus(entity.getAvailabilityStatus());
+
+        return dto;
+    }
+
+    private RoommateListingDto mapToRoommateDto(RoommateListing entity) {
+        RoommateListingDto dto = new RoommateListingDto();
+
+        // 1. Map all common Base properties
+        mapBaseListingFields(entity, dto);
+
+        if (entity.getUser() != null) {
+            dto.setUserId(entity.getUser().getId());
+            dto.setUserName(entity.getUser().getName());
+
+            // If you have a profile image linked, map it. Otherwise, remove this line.
+            if(entity.getUser().getProfileImage() != null) {
+                dto.setUserProfileImageUrl(entity.getUser().getProfileImage().getImageUrl());
+            }
+        }
+
+        // 2. Map Roommate specific properties
+        dto.setLookingForGender(entity.getLookingForGender());
+        dto.setReligionPreference(entity.getReligionPreference());
+        dto.setDietaryPreference(entity.getDietaryPreference());
+        dto.setCurrentRoommates(entity.getCurrentRoommates());
+        dto.setNeededRoommates(entity.getNeededRoommates());
+
+        return dto;
+    }
+
+    private void mapBaseListingFields(BaseListing entity, BaseListingDto dto) {
+        dto.setId(entity.getId());
+        dto.setImageUrls(entity.getImageUrls());
+        dto.setLocation(entity.getLocation());
+        dto.setCity(entity.getCity());
+        dto.setState(entity.getState());
+        dto.setPincode(entity.getPincode());
+        dto.setDescription(entity.getDescription());
+        dto.setBhkType(entity.getBhkType());
+        dto.setFloorNumber(entity.getFloorNumber());
+        dto.setHasParking(entity.isHasParking());
+        dto.setFurnished(entity.isFurnished());
+        dto.setWaterSupply24x7(entity.isWaterSupply24x7());
+        dto.setElectricityBackup(entity.isElectricityBackup());
+        dto.setRentAmount(entity.getRentAmount());
+        dto.setPostedOn(entity.getPostedOn());
     }
 
 }
