@@ -113,16 +113,27 @@ public class ListingService {
         listing.setRentAmount(request.getRentAmount());
     }
 
-    public PagedResponse<RoomListingDto> getAllRooms(int pageNo, int pageSize, String sortBy, String sortDir) {
-        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
-                ? Sort.by(sortBy).ascending()
-                : Sort.by(sortBy).descending();
+    public PagedResponse<RoomListingDto> getAllRooms(
+            String query, String bhk, Double min, Double max,
+            boolean furnish, boolean park, boolean water, boolean elec,int pageNo, int pageSize, String sortBy, String sortDir) {
+
+        Sort sort;
+        if ("rentAmountAsc".equals(sortBy)) {
+            sort = Sort.by(Sort.Direction.ASC, "rentAmount");
+        } else if ("rentAmountDesc".equals(sortBy)) {
+            sort = Sort.by(Sort.Direction.DESC, "rentAmount");
+        } else {
+            sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
+                    ? Sort.by(sortBy).ascending()
+                    : Sort.by(sortBy).descending();
+        }
 
         // Create Pageable instance
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
         // Fetch paginated data from DB
-        Page<RoomListing> roomPage = roomListingRepository.findAll(pageable);
+        Page<RoomListing> roomPage = roomListingRepository.findFilteredRooms(
+                query, bhk, min, max, furnish, park, water, elec,pageable);
 
         // Map Entities to DTOs
         List<RoomListingDto> content = roomPage.getContent().stream()
@@ -141,7 +152,9 @@ public class ListingService {
 
     }
 
-    public PagedResponse<RoommateListingDto> getAllRoommates(int pageNo, int pageSize, String sortBy, String sortDir) {
+    public PagedResponse<RoommateListingDto> getAllRoommates(
+            String query, String bhk , String gender, String diet, String religion,Double min, Double max,
+            boolean furnish, boolean park, boolean water, boolean elec,int pageNo, int pageSize, String sortBy, String sortDir) {
 
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
                 ? Sort.by(sortBy).ascending()
@@ -149,7 +162,8 @@ public class ListingService {
 
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
-        Page<RoommateListing> roommatePage = roommateListingRepository.findAll(pageable);
+        Page<RoommateListing> roommatePage = roommateListingRepository.findFilteredRoommates(
+                query, bhk, gender, diet, religion, min, max, furnish, park, water, elec,pageable);
 
         List<RoommateListingDto> content = roommatePage.getContent().stream()
                 .map(this::mapToRoommateDto)

@@ -66,6 +66,14 @@ public class ListingController {
 
     @GetMapping("/rooms")
     public ResponseEntity<PagedResponse<RoomListingDto>> getRooms(
+            @RequestParam(required = false) String searchQuery,
+            @RequestParam(required = false) String bhkType,
+            @RequestParam(required = false) Double minRent,
+            @RequestParam(required = false) Double maxRent,
+            @RequestParam(defaultValue = "false") boolean isFurnished,
+            @RequestParam(defaultValue = "false") boolean hasParking,
+            @RequestParam(defaultValue = "false") boolean waterSupply24x7,
+            @RequestParam(defaultValue = "false") boolean electricityBackup,
             @RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNo,
             @RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
             @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
@@ -74,11 +82,23 @@ public class ListingController {
         // Validation constraint check
         if (pageNo < 0) throw new BadRequestException("Page index must not be less than zero");
 
-        return ResponseEntity.ok(listingService.getAllRooms(pageNo, pageSize, sortBy, sortDir));
+        return ResponseEntity.ok(listingService.getAllRooms(searchQuery, bhkType, minRent, maxRent,
+                isFurnished, hasParking, waterSupply24x7, electricityBackup,pageNo, pageSize, sortBy, sortDir));
     }
 
     @GetMapping("/roommates")
     public ResponseEntity<PagedResponse<RoommateListingDto>> getRoommates(
+            @RequestParam(required = false) String searchQuery,
+            @RequestParam(required = false) String bhkType,
+            @RequestParam(required = false) String lookingForGender,
+            @RequestParam(required = false) String dietaryPreference,
+            @RequestParam(required = false) String religionPreference,
+            @RequestParam(required = false) Double minRent,
+            @RequestParam(required = false) Double maxRent,
+            @RequestParam(defaultValue = "false") boolean isFurnished,
+            @RequestParam(defaultValue = "false") boolean hasParking,
+            @RequestParam(defaultValue = "false") boolean waterSupply24x7,
+            @RequestParam(defaultValue = "false") boolean electricityBackup,
             @RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNo,
             @RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
             @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
@@ -86,7 +106,8 @@ public class ListingController {
     ) {
         if (pageNo < 0) throw new BadRequestException("Page index must not be less than zero");
 
-        return ResponseEntity.ok(listingService.getAllRoommates(pageNo, pageSize, sortBy, sortDir));
+        return ResponseEntity.ok(listingService.getAllRoommates(searchQuery, bhkType ,lookingForGender, dietaryPreference, religionPreference,
+                minRent, maxRent, isFurnished, hasParking, waterSupply24x7, electricityBackup,pageNo, pageSize, sortBy, sortDir));
     }
 
 }
