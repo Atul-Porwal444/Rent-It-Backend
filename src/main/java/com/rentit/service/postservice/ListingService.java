@@ -113,6 +113,12 @@ public class ListingService {
         listing.setRentAmount(request.getRentAmount());
     }
 
+    public RoomListingDto getRoomById(Long id) {
+        RoomListing room = roomListingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Room not found"));
+        return mapToRoomDto(room);
+    }
+
     public PagedResponse<RoomListingDto> getAllRooms(
             String query, String bhk, Double min, Double max,
             boolean furnish, boolean park, boolean water, boolean elec,int pageNo, int pageSize, String sortBy, String sortDir) {
