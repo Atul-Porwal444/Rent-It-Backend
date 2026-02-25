@@ -69,6 +69,11 @@ public class ListingController {
         return ResponseEntity.ok(listingService.getRoomById(id));
     }
 
+    @GetMapping("/roommates/{id}")
+    public ResponseEntity<RoommateListingDto> getRoommateById(@PathVariable Long id) {
+        return ResponseEntity.ok(listingService.getRoommateById(id));
+    }
+
     @GetMapping("/rooms")
     public ResponseEntity<PagedResponse<RoomListingDto>> getRooms(
             @RequestParam(required = false) String searchQuery,

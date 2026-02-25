@@ -119,6 +119,12 @@ public class ListingService {
         return mapToRoomDto(room);
     }
 
+    public RoommateListingDto getRoommateById(Long id) {
+        RoommateListing roommate = roommateListingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Roommate not found"));
+        return mapToRoommateDto(roommate);
+    }
+
     public PagedResponse<RoomListingDto> getAllRooms(
             String query, String bhk, Double min, Double max,
             boolean furnish, boolean park, boolean water, boolean elec,int pageNo, int pageSize, String sortBy, String sortDir) {
