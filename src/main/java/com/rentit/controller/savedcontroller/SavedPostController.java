@@ -4,10 +4,7 @@ import com.rentit.payload.response.ApiResponse;
 import com.rentit.service.savedpostservice.SavedPostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
@@ -18,8 +15,8 @@ public class SavedPostController {
 
     private final SavedPostService savedPostService;
 
-    @PostMapping("/room")
-    public ResponseEntity<ApiResponse> toggleSavedRoom(Principal principal, @RequestParam Long postId) {
+    @PostMapping("/room/{postId}")
+    public ResponseEntity<ApiResponse> toggleSavedRoom(Principal principal, @PathVariable Long postId) {
         try {
 
             savedPostService.toggleSavedRoom(principal, postId);
@@ -31,8 +28,8 @@ public class SavedPostController {
         }
     }
 
-    @PostMapping("/roommate")
-    public ResponseEntity<ApiResponse> toggleSavedRoommate(Principal principal, @RequestParam Long postId) {
+    @PostMapping("/roommate/{postId}")
+    public ResponseEntity<ApiResponse> toggleSavedRoommate(Principal principal, @PathVariable Long postId) {
         try {
 
             savedPostService.toggleSavedRoommate(principal, postId);
@@ -42,6 +39,16 @@ public class SavedPostController {
         } catch (Exception e) {
             return ResponseEntity.status(500).body(new ApiResponse(false, "Internal Server Error: " + e.getMessage(), null));
         }
+    }
+
+    @GetMapping("/room/{postId}/status")
+    public ResponseEntity<Boolean> checkRoomStatus(Principal principal, @PathVariable Long postId) {
+        return ResponseEntity.ok(savedPostService.isRoomSaved(principal, postId));
+    }
+
+    @GetMapping("roommate/{postId}/status")
+    public ResponseEntity<Boolean> checkRoommateStatus(Principal principal, @PathVariable Long postId) {
+        return ResponseEntity.ok(savedPostService.isRoommateSaved(principal, postId));
     }
 
 }

@@ -36,6 +36,20 @@ public class SavedPostService {
                 .orElseThrow(() -> new ResourceNotFoundException("Username not found"));
     }
 
+    public boolean isRoomSaved(Principal principal, Long postId) {
+        UserEntity user = getUserFromPrincipal(principal);
+        RoomListing room = roomListingRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException("Room listing not found"));
+        return savedRoomPostRepository.findByUserAndRoomListing(user, room).isPresent();
+    }
+
+    public boolean isRoommateSaved(Principal principal, Long postId) {
+        UserEntity user = getUserFromPrincipal(principal);
+        RoommateListing roommate = roommateListingRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException("Roommate listing not found"));
+        return savedRoommatePostRepository.findByUserAndRoommateListing(user, roommate).isPresent();
+    }
+
     public void toggleSavedRoom(Principal principal, Long postId) {
         UserEntity user = getUserFromPrincipal(principal);
         RoomListing room = roomListingRepository.findById(postId).orElseThrow(() ->
@@ -71,6 +85,4 @@ public class SavedPostService {
             savedRoommatePostRepository.save(savedRoommatePost);
         }
     }
-
-
 }
