@@ -1,12 +1,15 @@
 package com.rentit.controller.savedcontroller;
 
 import com.rentit.payload.response.ApiResponse;
+import com.rentit.payload.response.post.RoomListingDto;
+import com.rentit.payload.response.post.RoommateListingDto;
 import com.rentit.service.savedpostservice.SavedPostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -49,6 +52,16 @@ public class SavedPostController {
     @GetMapping("roommate/{postId}/status")
     public ResponseEntity<Boolean> checkRoommateStatus(Principal principal, @PathVariable Long postId) {
         return ResponseEntity.ok(savedPostService.isRoommateSaved(principal, postId));
+    }
+
+    @GetMapping("/rooms")
+    public ResponseEntity<List<RoomListingDto>> getMySavedRooms(Principal principal) {
+        return ResponseEntity.ok(savedPostService.getSavedRoomsForUser(principal));
+    }
+
+    @GetMapping("/roommates")
+    public ResponseEntity<List<RoommateListingDto>> getMySavedRoommates(Principal principal) {
+        return ResponseEntity.ok(savedPostService.getSavedRoommatesForUser(principal));
     }
 
 }

@@ -191,7 +191,7 @@ public class ListingService {
         );
     }
 
-    private RoomListingDto mapToRoomDto(RoomListing entity) {
+    public RoomListingDto mapToRoomDto(RoomListing entity) {
         RoomListingDto dto = new RoomListingDto();
 
         // 1. Map all common Base properties
@@ -213,7 +213,7 @@ public class ListingService {
         return dto;
     }
 
-    private RoommateListingDto mapToRoommateDto(RoommateListing entity) {
+    public RoommateListingDto mapToRoommateDto(RoommateListing entity) {
         RoommateListingDto dto = new RoommateListingDto();
 
         // 1. Map all common Base properties
