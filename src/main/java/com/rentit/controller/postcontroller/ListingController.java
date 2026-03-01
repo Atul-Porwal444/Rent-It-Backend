@@ -21,6 +21,7 @@ import tools.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -72,6 +73,28 @@ public class ListingController {
     @GetMapping("/roommates/{id}")
     public ResponseEntity<RoommateListingDto> getRoommateById(@PathVariable Long id) {
         return ResponseEntity.ok(listingService.getRoommateById(id));
+    }
+
+    @GetMapping("/my-rooms")
+    public ResponseEntity<List<RoomListingDto>> getMyRooms(Principal principal) {
+        return ResponseEntity.ok(listingService.getMyRooms(principal));
+    }
+
+    @GetMapping("/my-roommates")
+    public ResponseEntity<List<RoommateListingDto>> getMyRoommates(Principal principal) {
+        return ResponseEntity.ok(listingService.getMyRoommates(principal));
+    }
+
+    @DeleteMapping("/rooms/{id}")
+    public ResponseEntity<?> deleteRoom(@PathVariable Long id, Principal principal) {
+        listingService.deleteRoom(id, principal);
+        return ResponseEntity.ok(Map.of("success", true, "message", "Room post deleted successfully"));
+    }
+
+    @DeleteMapping("/roommates/{id}")
+    public ResponseEntity<?> deleteRoommate(@PathVariable Long id, Principal principal) {
+        listingService.deleteRoommate(id, principal);
+        return ResponseEntity.ok(Map.of("success", true, "message", "Roommate post deleted successfully"));
     }
 
     @GetMapping("/rooms")

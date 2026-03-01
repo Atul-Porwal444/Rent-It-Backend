@@ -1,6 +1,7 @@
 package com.rentit.repository.post;
 
 import com.rentit.entity.post.RoomListing;
+import com.rentit.entity.user.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -45,4 +46,6 @@ public interface RoomListingRepository extends JpaRepository<RoomListing, Long> 
             @Param("elec") boolean elec,
             Pageable pageable
     );
+
+    List<RoomListing> findByUser(UserEntity user);
 }

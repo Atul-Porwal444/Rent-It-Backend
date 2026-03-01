@@ -2,6 +2,7 @@ package com.rentit.repository.post;
 
 
 import com.rentit.entity.post.RoommateListing;
+import com.rentit.entity.user.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -52,4 +53,6 @@ public interface RoommateListingRepository extends JpaRepository<RoommateListing
             @Param("elec") boolean elec,
             Pageable pageable
     );
+
+    List<RoommateListing> findByUser(UserEntity user);
 }

@@ -191,6 +191,42 @@ public class ListingService {
         );
     }
 
+    public List<RoomListingDto> getMyRooms(Principal principal) {
+        UserEntity user = getUserFromPrincipal(principal);
+
+        return roomListingRepository.findByUser(user).stream()
+                .map(this::mapToRoomDto).collect(Collectors.toList());
+    }
+
+    public List<RoommateListingDto> getMyRoommates(Principal principal) {
+        UserEntity user = getUserFromPrincipal(principal);
+
+        return roommateListingRepository.findByUser(user).stream()
+                .map(this::mapToRoommateDto).collect(Collectors.toList());
+    }
+
+    public void deleteRoom(Long id, Principal principal) {
+        RoomListing room = roomListingRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Room not found"));
+
+        if(!room.getUser().getEmail().equals(principal.getName())) {
+            throw new RuntimeException("Unauthorized to delete this post");
+        }
+
+        roomListingRepository.delete(room);
+    }
+
+    public void deleteRoommate(Long id, Principal principal) {
+        RoommateListing roommate = roommateListingRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Roommate not found"));
+
+        if(!roommate.getUser().getEmail().equals(principal.getName())) {
+            throw new RuntimeException("Unauthorized to delete this post");
+        }
+
+        roommateListingRepository.delete(roommate);
+    }
+
     public RoomListingDto mapToRoomDto(RoomListing entity) {
         RoomListingDto dto = new RoomListingDto();
 
