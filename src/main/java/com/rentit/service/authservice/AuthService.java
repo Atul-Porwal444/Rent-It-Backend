@@ -186,4 +186,25 @@ public class AuthService {
         token.setExpiryDate(null);
         verificationTokenRepository.save(token);
     }
+
+    public void resendForgotPasswordOtp(String email) {
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User with this email not found"));
+
+        String otp = String.valueOf(new Random().nextInt(900000)+100000);
+
+        VerificationToken token = verificationTokenRepository.findByUser(user)
+                .orElse(null);
+
+        if(token == null) {
+            token = new VerificationToken();
+            token.setUser(user);
+        }
+
+        token.setOtp(otp);
+        token.setExpiryDate(LocalDateTime.now().plusMinutes(10));
+        verificationTokenRepository.save(token);
+
+        emailService.sendPasswordResetEmail(email, otp);
+    }
 }

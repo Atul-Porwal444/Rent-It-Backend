@@ -33,7 +33,7 @@ public class SecurityConfig  {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/signup","/api/auth/login", "/api/auth/verify-otp", "/api/auth/resend-otp","/api/auth/forgot-password", "/api/auth/reset-password", "/user/list/rooms", "/user/list/roommates").permitAll()
+                        .requestMatchers("/api/auth/signup","/api/auth/login", "/api/auth/verify-otp", "/api/auth/resend-otp","/api/auth/forgot-password", "/api/auth/reset-password", "/api/auth/resend-fp-otp", "/user/list/rooms", "/user/list/roommates").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(AbstractHttpConfigurer::disable)

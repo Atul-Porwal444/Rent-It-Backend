@@ -113,6 +113,15 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/resend-fp-otp")
+    public ResponseEntity<?> resendForgotPasswordOtp(@RequestBody Map<String, String> request) {
+        String email =  request.get("email");
+        if(email == null || email.isEmpty()){
+            return ResponseEntity.badRequest().body(Map.of("message", "Email is required"));
+        }
+        this.authService.resendForgotPasswordOtp(email);
+        return ResponseEntity.ok(Map.of("message", "OTP resent successfully"));
+    }
 
     private static LoginResponse getLoginResponse(UserEntity user, String token) {
         UserProfileEntity profile = user.getProfile();
