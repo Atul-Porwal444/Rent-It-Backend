@@ -5,7 +5,9 @@ import com.rentit.entity.user.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface VerificationTokenRepository extends JpaRepository<VerificationToken, Long> {
-    VerificationToken findByUser(UserEntity user);
+    Optional<VerificationToken> findByUser(UserEntity user);
 }

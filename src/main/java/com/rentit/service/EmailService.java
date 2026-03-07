@@ -36,6 +36,8 @@ public class EmailService {
             Context context = new Context();
             context.setVariable("email", toMail);
             context.setVariable("otp", otp);
+            context.setVariable("title", "Verify Your Account");
+            context.setVariable("message", "email verification");
 
             String htmlContent = templateEngine.process("email-verification", context);
 
@@ -50,6 +52,36 @@ public class EmailService {
             throw new RuntimeException("Failed to send email: " + e.getMessage());
         }
 
+    }
+
+    public void sendPasswordResetEmail(String toMail, String otp) {
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+
+            MimeMessageHelper helper = new MimeMessageHelper(
+                    mimeMessage,
+                    MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+                    StandardCharsets.UTF_8.name()
+            );
+
+            Context context = new Context();
+            context.setVariable("email", toMail);
+            context.setVariable("otp", otp);
+            context.setVariable("title", "Forgot Password Request");
+            context.setVariable("message", "forgot password");
+
+            String htmlContent = templateEngine.process("email-verification", context);
+
+            helper.setTo(toMail);
+            helper.setSubject("RentIt - Forgot Password");
+            helper.setFrom(fromMail);
+            helper.setText(htmlContent, true);
+
+            mailSender.send(mimeMessage);
+
+        } catch (MessagingException e) {
+            throw new RuntimeException("Failed to send password reset email: " + e.getMessage());
+        }
     }
 
 }

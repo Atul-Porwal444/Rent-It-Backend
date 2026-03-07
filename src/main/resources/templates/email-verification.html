@@ -41,15 +41,15 @@
     </style>
 </head>
 <body>
-<h1>Verify Your Account</h1>
-<p>We received a email verification request for your account: </p>
+<h1 th:text="${title}"></h1>
+<p>We received a <span th:text="${message}"></span> request for your account: </p>
 <p><a th:href="'mailto:' + ${email}" th:text="${email}"></a></p>
 
-<p><strong>Use the OTP below to verify your account</strong></p>
+<p><strong>Use the OTP below to verify your email</strong></p>
 
 <div class="otp-code" th:text="${otp}">123456</div>
 
-<p>The email verification OTP is only valid for the next 10 minutes.</p>
+<p>The <span th:text="${message}"></span> OTP is only valid for the next 10 minutes.</p>
 
 <div class="footer">
     <p>If you didn't request this email verification, please ignore this email.</p>

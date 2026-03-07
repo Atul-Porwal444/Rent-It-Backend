@@ -17,7 +17,7 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
-    @GetMapping
+    @GetMapping("/notification")
     public ResponseEntity<List<NotificationDto>> getNotifications(Principal principal) {
         return ResponseEntity.ok(notificationService.getMyNotifications(principal));
     }

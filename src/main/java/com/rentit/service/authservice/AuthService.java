@@ -6,6 +6,7 @@ import com.rentit.entity.user.UserEntity;
 import com.rentit.entity.user.UserProfileEntity;
 import com.rentit.exception.ResourceNotFoundException;
 import com.rentit.payload.request.auth.LoginRequest;
+import com.rentit.payload.request.auth.ResetPasswordRequest;
 import com.rentit.payload.request.auth.SignupRequest;
 import com.rentit.payload.request.auth.VerificationRequest;
 import com.rentit.repository.auth.VerificationTokenRepository;
@@ -86,7 +87,8 @@ public class AuthService {
         UserEntity user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("User with this email not found"));
 
-        VerificationToken token = verificationTokenRepository.findByUser(user);
+        VerificationToken token = verificationTokenRepository.findByUser(user)
+                .orElseThrow(() -> new ResourceNotFoundException("No account verification request found for this user"));
 
         if(token.getOtp().equals(request.getOtp()) && token.getExpiryDate().isAfter(LocalDateTime.now())) {
             user.setVerified(true);
@@ -109,7 +111,9 @@ public class AuthService {
 
         String otp = String.valueOf(new Random().nextInt(900000)+100000);
 
-        VerificationToken token = verificationTokenRepository.findByUser(user);
+        VerificationToken token = verificationTokenRepository.findByUser(user)
+                .orElse(null);
+
         if(token == null) {
             token = new VerificationToken();
             token.setUser(user);
@@ -140,5 +144,46 @@ public class AuthService {
                 .orElseThrow(() -> new ResourceNotFoundException("User with this email not found"));
 
         return user.isVerified();
+    }
+
+    public void processForgotPassword(String email) {
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User with this email not found"));
+
+        String otp = String.valueOf(new Random().nextInt(900000)+100000);
+
+        VerificationToken token = verificationTokenRepository.findByUser(user)
+                .orElse(new VerificationToken());
+
+        token.setUser(user);
+        token.setOtp(otp);
+        token.setExpiryDate(LocalDateTime.now().plusMinutes(10));
+
+        verificationTokenRepository.save(token);
+
+        emailService.sendPasswordResetEmail(email, otp);
+    }
+
+    public void processResetPassword(ResetPasswordRequest resetPasswordRequest) {
+        UserEntity user = userRepository.findByEmail(resetPasswordRequest.getEmail())
+                .orElseThrow(() -> new ResourceNotFoundException("User with this email not found"));
+
+        VerificationToken token = verificationTokenRepository.findByUser(user)
+                .orElseThrow(() -> new ResourceNotFoundException("No password reset request found for this user."));
+
+        if(!token.getOtp().equals(resetPasswordRequest.getOtp())) {
+            throw new RuntimeException("Invalid OTP");
+        }
+
+        if(token.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("OTP has expired. Please request a new one.");
+        }
+
+        user.setPassword(passwordEncoder.encode(resetPasswordRequest.getNewPassword()));
+        userRepository.save(user);
+
+        token.setOtp(null);
+        token.setExpiryDate(null);
+        verificationTokenRepository.save(token);
     }
 }

@@ -3,9 +3,7 @@ package com.rentit.controller.authcontroller;
 import com.rentit.entity.user.UserEntity;
 import com.rentit.entity.user.UserProfileEntity;
 import com.rentit.exception.ResourceNotFoundException;
-import com.rentit.payload.request.auth.LoginRequest;
-import com.rentit.payload.request.auth.SignupRequest;
-import com.rentit.payload.request.auth.VerificationRequest;
+import com.rentit.payload.request.auth.*;
 import com.rentit.payload.response.ApiResponse;
 import com.rentit.payload.response.LoginResponse;
 import com.rentit.repository.user.UserRepository;
@@ -94,6 +92,27 @@ public class AuthController {
             );
         }
     }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest forgotPasswordRequest) {
+        try {
+            authService.processForgotPassword(forgotPasswordRequest.getEmail());
+            return ResponseEntity.ok(new ApiResponse(true, "Reset code sent to email", null));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body((new ApiResponse(false, e.getMessage(), null)));
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+        try {
+            authService.processResetPassword(request);
+            return ResponseEntity.ok(new ApiResponse(true, "Password reset successfully", null));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ApiResponse(false, e.getMessage(), null));
+        }
+    }
+
 
     private static LoginResponse getLoginResponse(UserEntity user, String token) {
         UserProfileEntity profile = user.getProfile();
