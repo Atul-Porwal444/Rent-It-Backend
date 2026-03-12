@@ -1,6 +1,7 @@
 package com.rentit.entity.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.rentit.entity.auth.VerificationToken;
 import com.rentit.entity.post.RoomListing;
 import com.rentit.entity.post.RoommateListing;
 import com.rentit.entity.saved.SavedRoomPost;
@@ -34,9 +35,11 @@ public class UserEntity {
     private boolean isVerified = false;
 
     @OneToOne(mappedBy = "user",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private UserProfileEntity profile;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private ProfileImage profileImage;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -52,4 +55,15 @@ public class UserEntity {
     @OneToMany(mappedBy = "user", cascade =  CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<SavedRoommatePost> savedRoommatePosts = new ArrayList<>();
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private VerificationToken verificationToken;
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Notification> notification;
+
+    @OneToOne(mappedBy = "user", orphanRemoval = true,  cascade = CascadeType.ALL)
+    private UserSettings userSettings;
 }
