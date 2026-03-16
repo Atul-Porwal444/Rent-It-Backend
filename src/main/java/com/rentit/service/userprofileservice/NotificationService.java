@@ -38,15 +38,12 @@ public class NotificationService {
                 .stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
-    public void markAsRead(Long id, Principal principal) {
-        Notification notification = notificationRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Notification not found"));
+    // Checking if user has any unread notifications
+    public boolean hasUnreadNotifications(Principal principal) {
+        UserEntity user = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-
-        if (notification.getUser().getEmail().equals(principal.getName())) {
-            notification.setRead(true);
-            notificationRepository.save(notification);
-        }
+        return notificationRepository.countByUserAndIsReadFalse(user) > 0;
     }
 
     public void markAllAsRead(Principal principal) {

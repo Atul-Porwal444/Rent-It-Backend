@@ -22,10 +22,9 @@ public class NotificationController {
         return ResponseEntity.ok(notificationService.getMyNotifications(principal));
     }
 
-    @PutMapping("/{id}/read")
-    public ResponseEntity<?> markAsRead(@PathVariable Long id, Principal principal) {
-        notificationService.markAsRead(id, principal);
-        return ResponseEntity.ok(Map.of("success", true));
+    @GetMapping("/has-unread")
+    public ResponseEntity<Boolean> hasUnreadNotifications(Principal principal) {
+        return ResponseEntity.ok(notificationService.hasUnreadNotifications(principal));
     }
 
     @PutMapping("/read-all")
