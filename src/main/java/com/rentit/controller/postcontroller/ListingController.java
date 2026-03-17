@@ -66,8 +66,8 @@ public class ListingController {
     }
 
     @GetMapping("/rooms/{id}")
-    public ResponseEntity<RoomListingDto> getRoomById(@PathVariable Long id) {
-        return ResponseEntity.ok(listingService.getRoomById(id));
+    public ResponseEntity<RoomListingDto> getRoomById(@PathVariable Long id, Principal principal) {
+        return ResponseEntity.ok(listingService.getRoomById(id, principal));
     }
 
     @GetMapping("/roommates/{id}")

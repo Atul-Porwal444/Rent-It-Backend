@@ -27,8 +27,13 @@ public abstract class BaseListingDto {
     private List<String> imageUrls;
     private LocalDate postedOn;
 
+    private boolean isSavedByUser;
 
     private Long userId;
     private String userName;
     private String userProfileImageUrl;
+    private boolean showEmail;
+    private boolean showPhone;
+    private String userEmail;
+    private String userPhone;
 }

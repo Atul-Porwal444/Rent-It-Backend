@@ -14,6 +14,8 @@ import com.rentit.repository.saved.SavedRoomPostRepository;
 import com.rentit.repository.saved.SavedRoommatePostRepository;
 import com.rentit.repository.user.UserRepository;
 import com.rentit.service.postservice.ListingService;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -96,7 +98,7 @@ public class SavedPostService {
     public List<RoomListingDto> getSavedRoomsForUser(Principal principal) {
         UserEntity user = getUserFromPrincipal(principal);
         return savedRoomPostRepository.findByUser(user).stream()
-                .map(saved -> listingService.mapToRoomDto(saved.getRoomListing()))
+                .map(saved -> listingService.mapToRoomDto(saved.getRoomListing(), principal))
                 .collect(Collectors.toList());
     }
 

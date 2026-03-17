@@ -17,7 +17,7 @@ public class UserSettings {
     private UserEntity user;
 
     //Privacy Settings
-    private boolean showEmail = false;
+    private boolean showEmail = true;
     private boolean showPhone = false;
     private boolean allowMessages = true;
 

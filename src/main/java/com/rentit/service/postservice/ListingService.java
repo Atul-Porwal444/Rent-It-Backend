@@ -14,8 +14,10 @@ import com.rentit.payload.response.post.RoomListingDto;
 import com.rentit.payload.response.post.RoommateListingDto;
 import com.rentit.repository.post.RoomListingRepository;
 import com.rentit.repository.post.RoommateListingRepository;
+import com.rentit.repository.saved.SavedRoomPostRepository;
 import com.rentit.repository.user.UserRepository;
 import com.rentit.service.media.ImageStorageService;
+import com.rentit.service.savedpostservice.SavedPostService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -40,6 +42,8 @@ public class ListingService {
     private final ImageStorageService imageStorageService;
 
     private final RoomListingRepository roomListingRepository;
+
+    private final SavedRoomPostRepository savedRoomPostRepository;
 
     private final RoommateListingRepository roommateListingRepository;
 
@@ -113,10 +117,12 @@ public class ListingService {
         listing.setRentAmount(request.getRentAmount());
     }
 
-    public RoomListingDto getRoomById(Long id) {
+    public RoomListingDto getRoomById(Long id, Principal principal) {
+
         RoomListing room = roomListingRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Room not found"));
-        return mapToRoomDto(room);
+
+        return mapToRoomDto(room, principal);
     }
 
     public RoommateListingDto getRoommateById(Long id) {
@@ -149,7 +155,7 @@ public class ListingService {
 
         // Map Entities to DTOs
         List<RoomListingDto> content = roomPage.getContent().stream()
-                .map(this::mapToRoomDto)
+                .map((RoomListing entity) -> mapToRoomDto(entity, null))
                 .collect(Collectors.toList());
 
         // Return Standard Wrapper
@@ -195,7 +201,7 @@ public class ListingService {
         UserEntity user = getUserFromPrincipal(principal);
 
         return roomListingRepository.findByUser(user).stream()
-                .map(this::mapToRoomDto).collect(Collectors.toList());
+                .map((RoomListing entity) -> mapToRoomDto(entity, principal)).collect(Collectors.toList());
     }
 
     public List<RoommateListingDto> getMyRoommates(Principal principal) {
@@ -227,18 +233,28 @@ public class ListingService {
         roommateListingRepository.delete(roommate);
     }
 
-    public RoomListingDto mapToRoomDto(RoomListing entity) {
+    public RoomListingDto mapToRoomDto(RoomListing entity, Principal principal) {
         RoomListingDto dto = new RoomListingDto();
 
         // 1. Map all common Base properties
         mapBaseListingFields(entity, dto);
 
+        if(principal != null)
+            dto.setSavedByUser(savedRoomPostRepository.findByUserAndRoomListing(getUserFromPrincipal(principal), entity).isPresent());
+
+        // Mapping the owner detail
         if (entity.getUser() != null) {
             dto.setUserId(entity.getUser().getId());
             dto.setUserName(entity.getUser().getName());
 
             if(entity.getUser().getProfileImage() != null) {
                 dto.setUserProfileImageUrl(entity.getUser().getProfileImage().getImageUrl());
+            }
+            if(entity.getUser().getUserSettings() != null) {
+                dto.setShowEmail(entity.getUser().getUserSettings().isShowEmail());
+                dto.setShowPhone(entity.getUser().getUserSettings().isShowPhone());
+                if(dto.isShowEmail()) dto.setUserEmail(entity.getUser().getEmail());
+                if(dto.isShowPhone()) dto.setUserPhone(entity.getUser().getProfile().getPhone());
             }
         }
 
