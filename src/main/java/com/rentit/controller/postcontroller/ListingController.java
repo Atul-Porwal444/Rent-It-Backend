@@ -71,8 +71,8 @@ public class ListingController {
     }
 
     @GetMapping("/roommates/{id}")
-    public ResponseEntity<RoommateListingDto> getRoommateById(@PathVariable Long id) {
-        return ResponseEntity.ok(listingService.getRoommateById(id));
+    public ResponseEntity<RoommateListingDto> getRoommateById(@PathVariable Long id, Principal principal) {
+        return ResponseEntity.ok(listingService.getRoommateById(id, principal));
     }
 
     @GetMapping("/my-rooms")

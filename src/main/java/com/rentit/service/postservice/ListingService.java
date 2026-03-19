@@ -15,6 +15,7 @@ import com.rentit.payload.response.post.RoommateListingDto;
 import com.rentit.repository.post.RoomListingRepository;
 import com.rentit.repository.post.RoommateListingRepository;
 import com.rentit.repository.saved.SavedRoomPostRepository;
+import com.rentit.repository.saved.SavedRoommatePostRepository;
 import com.rentit.repository.user.UserRepository;
 import com.rentit.service.media.ImageStorageService;
 import com.rentit.service.savedpostservice.SavedPostService;
@@ -46,6 +47,8 @@ public class ListingService {
     private final SavedRoomPostRepository savedRoomPostRepository;
 
     private final RoommateListingRepository roommateListingRepository;
+
+    private final SavedRoommatePostRepository  savedRoommatePostRepository;
 
     private UserEntity getUserFromPrincipal(Principal principal) {
         String email = principal.getName();
@@ -125,10 +128,10 @@ public class ListingService {
         return mapToRoomDto(room, principal);
     }
 
-    public RoommateListingDto getRoommateById(Long id) {
+    public RoommateListingDto getRoommateById(Long id, Principal principal) {
         RoommateListing roommate = roommateListingRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Roommate not found"));
-        return mapToRoommateDto(roommate);
+        return mapToRoommateDto(roommate, principal);
     }
 
     public PagedResponse<RoomListingDto> getAllRooms(
@@ -184,7 +187,7 @@ public class ListingService {
                 query, bhk, gender, diet, religion, min, max, furnish, park, water, elec,pageable);
 
         List<RoommateListingDto> content = roommatePage.getContent().stream()
-                .map(this::mapToRoommateDto)
+                .map((RoommateListing entity) -> mapToRoommateDto(entity, null))
                 .collect(Collectors.toList());
 
         return new PagedResponse<>(
@@ -208,7 +211,7 @@ public class ListingService {
         UserEntity user = getUserFromPrincipal(principal);
 
         return roommateListingRepository.findByUser(user).stream()
-                .map(this::mapToRoommateDto).collect(Collectors.toList());
+                .map((RoommateListing entity) -> mapToRoommateDto(entity, principal)).collect(Collectors.toList());
     }
 
     public void deleteRoom(Long id, Principal principal) {
@@ -265,11 +268,14 @@ public class ListingService {
         return dto;
     }
 
-    public RoommateListingDto mapToRoommateDto(RoommateListing entity) {
+    public RoommateListingDto mapToRoommateDto(RoommateListing entity, Principal principal) {
         RoommateListingDto dto = new RoommateListingDto();
 
         // 1. Map all common Base properties
         mapBaseListingFields(entity, dto);
+
+        if(principal != null)
+            dto.setSavedByUser(savedRoommatePostRepository.findByUserAndRoommateListing(getUserFromPrincipal(principal), entity).isPresent());
 
         if (entity.getUser() != null) {
             dto.setUserId(entity.getUser().getId());
@@ -278,6 +284,12 @@ public class ListingService {
             // If you have a profile image linked, map it. Otherwise, remove this line.
             if(entity.getUser().getProfileImage() != null) {
                 dto.setUserProfileImageUrl(entity.getUser().getProfileImage().getImageUrl());
+            }
+            if(entity.getUser().getUserSettings() != null) {
+                dto.setShowEmail(entity.getUser().getUserSettings().isShowEmail());
+                dto.setShowPhone(entity.getUser().getUserSettings().isShowPhone());
+                if(dto.isShowEmail()) dto.setUserEmail(entity.getUser().getEmail());
+                if(dto.isShowPhone()) dto.setUserPhone(entity.getUser().getProfile().getPhone());
             }
         }
 

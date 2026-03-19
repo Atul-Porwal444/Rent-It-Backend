@@ -105,7 +105,7 @@ public class SavedPostService {
     public List<RoommateListingDto> getSavedRoommatesForUser(Principal principal) {
         UserEntity user = getUserFromPrincipal(principal);
         return savedRoommatePostRepository.findByUser(user).stream()
-                .map(saved -> listingService.mapToRoommateDto(saved.getRoommateListing()))
+                .map(saved -> listingService.mapToRoommateDto(saved.getRoommateListing(), principal))
                 .collect(Collectors.toList());
     }
 }
