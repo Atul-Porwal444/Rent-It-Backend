@@ -50,6 +50,7 @@ public class AuthService {
 
         UserEntity userEntity = new UserEntity();
         userEntity.setName(signupRequest.getName());
+        userEntity.setTargetCity(signupRequest.getTargetCity());
         userEntity.setEmail(signupRequest.getEmail());
         userEntity.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
         userEntity.setVerified(false);

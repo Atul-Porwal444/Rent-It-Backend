@@ -25,6 +25,9 @@ public class UserEntity {
 
     private String name;
 
+    @Column(name = "target_city")
+    private String targetCity;
+
     @Column(nullable = false, unique = true)
     private String email;
 

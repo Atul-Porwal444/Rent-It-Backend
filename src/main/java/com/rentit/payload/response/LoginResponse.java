@@ -11,6 +11,7 @@ public class LoginResponse {
     private Long id;
     private String token;
     private String name;
+    private String targetCity;
     private String email;
     private String profileUrl;
     private String location;

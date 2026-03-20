@@ -130,6 +130,7 @@ public class AuthController {
         response.setId(user.getId());
         response.setToken(token);
         response.setName(user.getName());
+        response.setTargetCity(user.getTargetCity());
         response.setEmail(user.getEmail());
         response.setProfileUrl(user.getProfileImage().getImageUrl());
         response.setLocation(profile.getLocation());
