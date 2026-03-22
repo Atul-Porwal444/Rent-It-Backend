@@ -33,4 +33,15 @@ public class NotificationController {
         return ResponseEntity.ok(Map.of("success", true));
     }
 
+    @PostMapping("/room/{id}/contact")
+    public ResponseEntity<Boolean> contactRoomOwner(@PathVariable Long id, Principal principal) {
+        return ResponseEntity.ok(notificationService.contactRoomOwner(id, principal));
+    }
+
+    @PostMapping("/roommate/{id}/contact")
+    public ResponseEntity<Boolean> contactRoommateOwner(@PathVariable Long id, Principal principal) {
+        return ResponseEntity.ok(notificationService.contactRoommateOwner(id, principal));
+    }
+
+
 }
