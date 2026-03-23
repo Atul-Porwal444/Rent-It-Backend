@@ -15,6 +15,7 @@ import com.rentit.service.EmailService;
 import com.rentit.utility.JwtUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -128,6 +129,11 @@ public class AuthService {
     }
 
     public String loginUser(LoginRequest loginRequest) {
+
+        if(!isAccountVerified(loginRequest.getEmail())) {
+            throw new AccessDeniedException("Account is not verified");
+        }
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
         );

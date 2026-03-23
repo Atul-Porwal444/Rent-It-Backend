@@ -26,12 +26,14 @@ import java.util.List;
 public class SecurityConfig  {
 
     private final JwtFilter jwtFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint)) // will work when there is any error while finding the jwt
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/signup","/api/auth/login", "/api/auth/verify-otp", "/api/auth/resend-otp","/api/auth/forgot-password", "/api/auth/reset-password", "/api/auth/resend-fp-otp", "/user/list/rooms", "/user/list/roommates").permitAll()
                         .anyRequest().authenticated()
@@ -45,7 +47,7 @@ public class SecurityConfig  {
     }
 
     @Bean
-    public AuthenticationManager authenticationManagerBean(AuthenticationConfiguration config) throws Exception {
+    public AuthenticationManager authenticationManagerBean(AuthenticationConfiguration config) {
         return config.getAuthenticationManager();
     }
 
@@ -57,9 +59,12 @@ public class SecurityConfig  {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("*"));
+        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+        // this will allow the browser to send or receive the cookies
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

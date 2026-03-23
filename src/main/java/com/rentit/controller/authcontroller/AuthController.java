@@ -1,13 +1,11 @@
 package com.rentit.controller.authcontroller;
 
-import com.rentit.entity.user.UserEntity;
-import com.rentit.entity.user.UserProfileEntity;
-import com.rentit.exception.ResourceNotFoundException;
 import com.rentit.payload.request.auth.*;
 import com.rentit.payload.response.ApiResponse;
-import com.rentit.payload.response.LoginResponse;
 import com.rentit.repository.user.UserRepository;
 import com.rentit.service.authservice.AuthService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,34 +61,18 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<ApiResponse> login(@RequestBody LoginRequest request, HttpServletResponse servletResponse) {
+        String token = authService.loginUser(request);
 
-        if(!authService.isAccountVerified(request.getEmail())) {
-            return ResponseEntity.status(403).body(new ApiResponse(
-                    false,
-                    "Unverified account",
-                    null
-            ));
-        }
+        Cookie jwtCookie = new Cookie("token", token);
+        jwtCookie.setHttpOnly(true); // this will only allow browser to access the cookie, prevention from XSs
+        jwtCookie.setSecure(false); // set true in the production because of https
+        jwtCookie.setPath("/"); // cookie is valid for whole app
+        jwtCookie.setMaxAge(24 * 60 * 60); // for one day
 
-        try {
-            String token = authService.loginUser(request);
+        servletResponse.addCookie(jwtCookie);
 
-            UserEntity user = userRepository.findByEmail(request.getEmail())
-                    .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-
-            final LoginResponse response = getLoginResponse(user, token);
-            // Return 200 OK with the Token data
-            return ResponseEntity.ok(
-                    new ApiResponse(true, "Login Successful", response)
-            );
-        } catch (RuntimeException e) {
-            // Return 401 UNAUTHORIZED for bad password
-            return new ResponseEntity<>(
-                    new ApiResponse(false, "Invalid email or password", null),
-                    HttpStatus.UNAUTHORIZED
-            );
-        }
+        return ResponseEntity.ok(new ApiResponse(true, "Login successfully", null));
     }
 
     @PostMapping("/forgot-password")
@@ -121,24 +103,5 @@ public class AuthController {
         }
         this.authService.resendForgotPasswordOtp(email);
         return ResponseEntity.ok(Map.of("message", "OTP resent successfully"));
-    }
-
-    private static LoginResponse getLoginResponse(UserEntity user, String token) {
-        UserProfileEntity profile = user.getProfile();
-
-        LoginResponse response = new LoginResponse();
-        response.setId(user.getId());
-        response.setToken(token);
-        response.setName(user.getName());
-        response.setTargetCity(user.getTargetCity());
-        response.setEmail(user.getEmail());
-        response.setProfileUrl(user.getProfileImage().getImageUrl());
-        response.setLocation(profile.getLocation());
-        response.setDob(profile.getDob());
-        response.setPhone(profile.getPhone());
-        response.setGender(profile.getGender());
-        response.setOccupation(profile.getOccupation());
-        response.setBio(profile.getBio());
-        return response;
     }
 }
