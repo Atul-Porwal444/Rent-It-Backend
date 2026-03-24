@@ -64,7 +64,7 @@ public class AuthController {
     public ResponseEntity<ApiResponse> login(@RequestBody LoginRequest request, HttpServletResponse servletResponse) {
         String token = authService.loginUser(request);
 
-        Cookie jwtCookie = new Cookie("token", token);
+        Cookie jwtCookie = new Cookie("jwt", token);
         jwtCookie.setHttpOnly(true); // this will only allow browser to access the cookie, prevention from XSs
         jwtCookie.setSecure(false); // set true in the production because of https
         jwtCookie.setPath("/"); // cookie is valid for whole app
@@ -73,6 +73,18 @@ public class AuthController {
         servletResponse.addCookie(jwtCookie);
 
         return ResponseEntity.ok(new ApiResponse(true, "Login successfully", null));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse> logout(HttpServletResponse servletResponse) {
+        Cookie jwtCookie = new Cookie("jwt", null);
+        jwtCookie.setHttpOnly(true);
+        jwtCookie.setSecure(false);
+        jwtCookie.setPath("/");
+        jwtCookie.setMaxAge(0);
+
+        servletResponse.addCookie(jwtCookie);
+        return ResponseEntity.ok(new ApiResponse(true, "Logout successfully", null));
     }
 
     @PostMapping("/forgot-password")

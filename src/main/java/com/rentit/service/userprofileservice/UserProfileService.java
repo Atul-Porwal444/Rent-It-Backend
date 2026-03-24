@@ -1,5 +1,6 @@
 package com.rentit.service.userprofileservice;
 
+import com.rentit.dto.UserSummaryDto;
 import com.rentit.entity.user.ProfileImage;
 import com.rentit.entity.user.UserEntity;
 import com.rentit.entity.user.UserProfileEntity;
@@ -36,6 +37,22 @@ public class UserProfileService {
         String email = principal.getName();
         return userRepository.findByEmail(email).
                 orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    }
+
+    public UserSummaryDto getCurrentUser(Principal principal) {
+        UserEntity userEntity = getUserFromPrincipal(principal);
+
+        return setCurrentUser(userEntity);
+    }
+
+    private UserSummaryDto setCurrentUser(UserEntity userEntity) {
+        UserSummaryDto userSummaryDto = new UserSummaryDto();
+        userSummaryDto.setId(userEntity.getId());
+        userSummaryDto.setName(userEntity.getName());
+        userSummaryDto.setTargetCity(userEntity.getTargetCity());
+        userSummaryDto.setProfileUrl(userEntity.getProfileImage().getImageUrl());
+
+        return userSummaryDto;
     }
 
     public void changePassword(PasswordChangeRequest passwordChangeRequest, Principal principal) {

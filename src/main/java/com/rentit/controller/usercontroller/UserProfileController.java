@@ -1,5 +1,6 @@
 package com.rentit.controller.usercontroller;
 
+import com.rentit.dto.UserSummaryDto;
 import com.rentit.payload.request.user.PasswordChangeRequest;
 import com.rentit.payload.request.user.UserProfileUpdateRequest;
 import com.rentit.payload.response.ApiResponse;
@@ -22,6 +23,12 @@ public class UserProfileController {
     private final UserProfileService userProfileService;
 
     private final UserRepository userRepository;
+
+
+    @GetMapping("/me")
+    public ResponseEntity<UserSummaryDto> getCurrentUser(Principal principal) {
+        return ResponseEntity.ok(userProfileService.getCurrentUser(principal));
+    }
 
     @PutMapping("/profile")
     public ResponseEntity<ApiResponse> updateUserProfile(@RequestBody UserProfileUpdateRequest userProfileUpdateRequest, Principal principal) {
