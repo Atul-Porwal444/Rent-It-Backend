@@ -1,5 +1,6 @@
 package com.rentit.service.userprofileservice;
 
+import com.rentit.dto.UserProfileDto;
 import com.rentit.dto.UserSummaryDto;
 import com.rentit.entity.user.ProfileImage;
 import com.rentit.entity.user.UserEntity;
@@ -43,6 +44,29 @@ public class UserProfileService {
         UserEntity userEntity = getUserFromPrincipal(principal);
 
         return setCurrentUser(userEntity);
+    }
+
+    public UserProfileDto getUserProfile(Principal principal) {
+        UserEntity userEntity = getUserFromPrincipal(principal);
+        return setUserProfile(userEntity);
+    }
+
+    private UserProfileDto setUserProfile(UserEntity userEntity) {
+        UserProfileDto userProfileDto = new UserProfileDto();
+        userProfileDto.setName(userEntity.getName());
+        userProfileDto.setEmail(userEntity.getEmail());
+
+        UserProfileEntity userProfileEntity = userEntity.getProfile();
+        userProfileDto.setPhone(userProfileEntity.getPhone());
+        userProfileEntity.setGender(userProfileEntity.getGender());
+        userProfileDto.setDob(userProfileEntity.getDob());
+        userProfileDto.setLocation(userProfileEntity.getLocation());
+        userProfileDto.setOccupation(userProfileEntity.getOccupation());
+        userProfileDto.setBio(userProfileEntity.getBio());
+
+        userProfileDto.setProfileUrl(userEntity.getProfileImage().getImageUrl());
+
+        return userProfileDto;
     }
 
     private UserSummaryDto setCurrentUser(UserEntity userEntity) {

@@ -1,5 +1,6 @@
 package com.rentit.controller.usercontroller;
 
+import com.rentit.dto.UserProfileDto;
 import com.rentit.dto.UserSummaryDto;
 import com.rentit.payload.request.user.PasswordChangeRequest;
 import com.rentit.payload.request.user.UserProfileUpdateRequest;
@@ -17,7 +18,7 @@ import java.util.HashMap;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/user/update")
+@RequestMapping("/api/user")
 public class UserProfileController {
 
     private final UserProfileService userProfileService;
@@ -30,13 +31,18 @@ public class UserProfileController {
         return ResponseEntity.ok(userProfileService.getCurrentUser(principal));
     }
 
-    @PutMapping("/profile")
+    @GetMapping("/profile")
+    public ResponseEntity<UserProfileDto> getUserProfile(Principal principal) {
+        return ResponseEntity.ok(userProfileService.getUserProfile(principal));
+    }
+
+    @PutMapping("/update/profile")
     public ResponseEntity<ApiResponse> updateUserProfile(@RequestBody UserProfileUpdateRequest userProfileUpdateRequest, Principal principal) {
         userProfileService.updateUserProfile(principal, userProfileUpdateRequest);
         return ResponseEntity.ok(new ApiResponse(true, "Profile updated successfully", userProfileUpdateRequest));
     }
 
-    @PostMapping("/profile-image")
+    @PostMapping("/update/profile-image")
     public ResponseEntity<ApiResponse> updateProfileImage(@RequestParam("image") MultipartFile file, Principal principal) {
         try {
             String publicUrl = userProfileService.updateProfileImage(principal,file);
@@ -49,7 +55,7 @@ public class UserProfileController {
         }
     }
 
-    @PostMapping("/password")
+    @PostMapping("/update/password")
     public ResponseEntity<ApiResponse> changePassword(@RequestBody PasswordChangeRequest passwordChangeRequest, Principal principal) {
         try {
             userProfileService.changePassword(passwordChangeRequest, principal);
