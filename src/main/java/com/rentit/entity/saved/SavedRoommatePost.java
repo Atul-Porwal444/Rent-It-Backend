@@ -3,11 +3,13 @@ package com.rentit.entity.saved;
 import com.rentit.entity.post.RoommateListing;
 import com.rentit.entity.user.UserEntity;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @Table(name = "saved_roommate_post", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"user_id", "roommate_listing_id"})
 })

@@ -1,9 +1,11 @@
 package com.rentit.entity.user;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "user_settings")
 public class UserSettings {

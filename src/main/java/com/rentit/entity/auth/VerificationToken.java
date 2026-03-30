@@ -2,12 +2,14 @@ package com.rentit.entity.auth;
 
 import com.rentit.entity.user.UserEntity;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Data
+@Getter
+@Setter
 public class VerificationToken {
 
     @Id

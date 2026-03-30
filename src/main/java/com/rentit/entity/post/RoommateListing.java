@@ -4,15 +4,17 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.rentit.entity.saved.SavedRoommatePost;
 import com.rentit.entity.user.UserEntity;
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "roommate_listings")
-@Data
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = true)
 public class RoommateListing extends BaseListing {
 
