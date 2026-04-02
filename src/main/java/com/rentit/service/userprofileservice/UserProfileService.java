@@ -2,13 +2,11 @@ package com.rentit.service.userprofileservice;
 
 import com.rentit.dto.UserProfileDto;
 import com.rentit.dto.UserSummaryDto;
-import com.rentit.entity.user.ProfileImage;
 import com.rentit.entity.user.UserEntity;
 import com.rentit.entity.user.UserProfileEntity;
 import com.rentit.exception.ResourceNotFoundException;
 import com.rentit.payload.request.user.PasswordChangeRequest;
 import com.rentit.payload.request.user.UserProfileUpdateRequest;
-import com.rentit.repository.user.ProfileImageRepository;
 import com.rentit.repository.user.UserProfileRepository;
 import com.rentit.repository.user.UserRepository;
 import com.rentit.service.media.ImageStorageService;
@@ -31,8 +29,6 @@ public class UserProfileService {
     private final ImageStorageService imageStorageService;
 
     private final UserProfileRepository userProfileRepository;
-
-    private final ProfileImageRepository profileImageRepository;
 
     private UserEntity getUserFromPrincipal(Principal principal) {
         String email = principal.getName();
@@ -64,7 +60,7 @@ public class UserProfileService {
         userProfileDto.setOccupation(userProfileEntity.getOccupation());
         userProfileDto.setBio(userProfileEntity.getBio());
 
-        userProfileDto.setProfileUrl(userEntity.getProfileImage().getImageUrl());
+        userProfileDto.setProfileUrl(userEntity.getProfileImageUrl());
 
         return userProfileDto;
     }
@@ -74,7 +70,7 @@ public class UserProfileService {
         userSummaryDto.setId(userEntity.getId());
         userSummaryDto.setName(userEntity.getName());
         userSummaryDto.setTargetCity(userEntity.getTargetCity());
-        userSummaryDto.setProfileUrl(userEntity.getProfileImage().getImageUrl());
+        userSummaryDto.setProfileUrl(userEntity.getProfileImageUrl());
 
         return userSummaryDto;
     }
@@ -129,14 +125,8 @@ public class UserProfileService {
 
         String publicUrl = imageStorageService.uploadImage(file);
 
-        ProfileImage profileImage = userEntity.getProfileImage();
-        if(profileImage == null) {
-            profileImage = new ProfileImage();
-            profileImage.setUser(userEntity);
-        }
-        profileImage.setImageUrl(publicUrl);
-
-        profileImageRepository.save(profileImage);
+        userEntity.setProfileImageUrl(publicUrl);
+        userRepository.save(userEntity);
 
         return publicUrl;
     }

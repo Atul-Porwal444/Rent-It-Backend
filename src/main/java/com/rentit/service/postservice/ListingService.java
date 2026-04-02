@@ -249,10 +249,8 @@ public class ListingService {
         if (entity.getUser() != null) {
             dto.setUserId(entity.getUser().getId());
             dto.setUserName(entity.getUser().getName());
+            dto.setUserProfileImageUrl(entity.getUser().getProfileImageUrl());
 
-            if(entity.getUser().getProfileImage() != null) {
-                dto.setUserProfileImageUrl(entity.getUser().getProfileImage().getImageUrl());
-            }
             if(entity.getUser().getUserSettings() != null) {
                 dto.setShowEmail(entity.getUser().getUserSettings().isShowEmail());
                 dto.setShowPhone(entity.getUser().getUserSettings().isShowPhone());
@@ -280,11 +278,8 @@ public class ListingService {
         if (entity.getUser() != null) {
             dto.setUserId(entity.getUser().getId());
             dto.setUserName(entity.getUser().getName());
+            dto.setUserProfileImageUrl(entity.getUser().getProfileImageUrl());
 
-            // If you have a profile image linked, map it. Otherwise, remove this line.
-            if(entity.getUser().getProfileImage() != null) {
-                dto.setUserProfileImageUrl(entity.getUser().getProfileImage().getImageUrl());
-            }
             if(entity.getUser().getUserSettings() != null) {
                 dto.setShowEmail(entity.getUser().getUserSettings().isShowEmail());
                 dto.setShowPhone(entity.getUser().getUserSettings().isShowPhone());

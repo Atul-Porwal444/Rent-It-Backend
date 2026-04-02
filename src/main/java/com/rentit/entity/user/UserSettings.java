@@ -11,10 +11,10 @@ import lombok.Setter;
 public class UserSettings {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private UserEntity user;
 

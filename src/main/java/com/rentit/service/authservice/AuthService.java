@@ -1,7 +1,6 @@
 package com.rentit.service.authservice;
 
 import com.rentit.entity.auth.VerificationToken;
-import com.rentit.entity.user.ProfileImage;
 import com.rentit.entity.user.UserEntity;
 import com.rentit.entity.user.UserProfileEntity;
 import com.rentit.exception.ResourceNotFoundException;
@@ -54,6 +53,7 @@ public class AuthService {
         userEntity.setTargetCity(signupRequest.getTargetCity());
         userEntity.setEmail(signupRequest.getEmail());
         userEntity.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
+        userEntity.setProfileImageUrl(DEFAULT_AVATAR);
         userEntity.setVerified(false);
 
         UserProfileEntity userProfileEntity = new UserProfileEntity();
@@ -65,11 +65,6 @@ public class AuthService {
         userProfileEntity.setBio("");
         userProfileEntity.setUser(userEntity);
         userEntity.setProfile(userProfileEntity);
-
-        ProfileImage profileImage = new ProfileImage();
-        profileImage.setImageUrl(DEFAULT_AVATAR + signupRequest.getName());
-        profileImage.setUser(userEntity);
-        userEntity.setProfileImage(profileImage);
 
         userRepository.save(userEntity);
 

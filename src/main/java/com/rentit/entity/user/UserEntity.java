@@ -40,9 +40,8 @@ public class UserEntity {
     @JsonIgnore
     private UserProfileEntity profile;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore
-    private ProfileImage profileImage;
+    @Column(name = "profile_image_url")
+    private String profileImageUrl;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<RoomListing> roomListings = new ArrayList<>();
@@ -52,7 +51,7 @@ public class UserEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    private List<SavedRoomPost> savedRoomPostss = new ArrayList<>();
+    private List<SavedRoomPost> savedRoomPosts = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade =  CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
@@ -62,10 +61,10 @@ public class UserEntity {
     @JsonIgnore
     private VerificationToken verificationToken;
 
-    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Notification> notification;
 
-    @OneToOne(mappedBy = "user", orphanRemoval = true,  cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user", orphanRemoval = true,  cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private UserSettings userSettings;
 }

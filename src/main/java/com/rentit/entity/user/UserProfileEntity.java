@@ -11,7 +11,6 @@ import lombok.*;
 public class UserProfileEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String location;
@@ -28,6 +27,7 @@ public class UserProfileEntity {
 
 
     @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 }
