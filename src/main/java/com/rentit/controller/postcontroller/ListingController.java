@@ -8,7 +8,6 @@ import com.rentit.payload.response.ApiResponse;
 import com.rentit.payload.response.PagedResponse;
 import com.rentit.payload.response.post.RoomListingDto;
 import com.rentit.payload.response.post.RoommateListingDto;
-import com.rentit.repository.user.UserRepository;
 import com.rentit.service.postservice.ListingService;
 import com.rentit.utility.AppConstants;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +28,6 @@ import java.util.Map;
 public class ListingController {
 
     private final ObjectMapper objectMapper;
-
-    private final UserRepository userRepository;
 
     private final ListingService listingService;
 

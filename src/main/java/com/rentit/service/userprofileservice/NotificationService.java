@@ -1,7 +1,6 @@
 package com.rentit.service.userprofileservice;
 
 import com.rentit.dto.NotificationDto;
-import com.rentit.entity.post.BaseListing;
 import com.rentit.entity.post.RoomListing;
 import com.rentit.entity.post.RoommateListing;
 import com.rentit.entity.user.Notification;
@@ -12,6 +11,7 @@ import com.rentit.repository.post.RoommateListingRepository;
 import com.rentit.repository.user.NotificationRepository;
 import com.rentit.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class NotificationService {
 
@@ -40,42 +41,52 @@ public class NotificationService {
     }
 
     public List<NotificationDto> getMyNotifications(Principal principal) {
+        log.info("DB call for fetching the user");
         UserEntity user = userRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
+        log.info("DB call for fetching the notification sorted by created at user");
         return notificationRepository.findByUserOrderByCreatedAtDesc(user)
                 .stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
     // Checking if user has any unread notifications
     public boolean hasUnreadNotifications(Principal principal) {
+        log.info("DB call for fetching the user");
         UserEntity user = userRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
+        log.info("DB call for checking the unread notifications method is notificationRepository.countByUserAndIsReadFalse(user)");
         return notificationRepository.countByUserAndIsReadFalse(user) > 0;
     }
 
     public void markAllAsRead(Principal principal) {
+        log.info("DB call for fetching the user");
         UserEntity user = userRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
+        log.info("DB call for fetching the notification sorted by created at user and filtering unread notifications");
         List<Notification> unread = notificationRepository.findByUserOrderByCreatedAtDesc(user)
                 .stream().filter(n -> !n.isRead()).collect(Collectors.toList());
 
         unread.forEach(n -> n.setRead(true));
+        log.info("DB call for saving the unread notifications calling the method saveAll");
         notificationRepository.saveAll(unread);
     }
 
     public Boolean contactRoomOwner(Long id, Principal principal) {
+        log.info("DB call for fetching the room by id");
         RoomListing post = roomListingRepository.findById(id).
                 orElseThrow(() -> new ResourceNotFoundException("Room listing not found"));
 
+        log.info("DB call for getting the room owner by calling post.getOwner()");
         UserEntity owner =  post.getUser();
         if(owner != null) {
             Notification notification = new Notification();
             notification.setUser(owner);
             notification.setType("alert");
             notification.setMessage("User showed interest in your room post. Contact: " + principal.getName());
+            log.info("DB call for saving the notification");
             notificationRepository.save(notification);
             return true;
         }
@@ -83,15 +94,18 @@ public class NotificationService {
     }
 
     public Boolean contactRoommateOwner(Long id, Principal principal) {
+        log.info("DB call for fetching the roommate by id");
         RoommateListing post = roommateListingRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Roommate listing not found"));
 
+        log.info("DB call for getting the room owner by calling post.getOwner()");
         UserEntity owner =  post.getUser();
         if(owner != null) {
             Notification notification = new Notification();
             notification.setUser(owner);
             notification.setType("alert");
             notification.setMessage("User showed interest in your roommate post. Contact: " + principal.getName());
+            log.info("DB call for saving the notification");
             notificationRepository.save(notification);
             return true;
         }

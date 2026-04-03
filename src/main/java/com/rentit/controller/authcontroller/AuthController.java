@@ -2,7 +2,6 @@ package com.rentit.controller.authcontroller;
 
 import com.rentit.payload.request.auth.*;
 import com.rentit.payload.response.ApiResponse;
-import com.rentit.repository.user.UserRepository;
 import com.rentit.service.authservice.AuthService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,7 +18,6 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
-    private final UserRepository userRepository;
 
     @PostMapping("signup")
     public ResponseEntity<ApiResponse> signupUser(@RequestBody SignupRequest signupRequest) {

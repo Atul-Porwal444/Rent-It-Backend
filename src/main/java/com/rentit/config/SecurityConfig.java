@@ -2,6 +2,7 @@ package com.rentit.config;
 
 import com.rentit.filter.JwtFilter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,6 +22,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 
 @Configuration
+@Slf4j
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig  {
@@ -58,6 +60,7 @@ public class SecurityConfig  {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+        log.info("Setting up CORS configuration");
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:4200"));
         configuration.setAllowedHeaders(List.of("*"));

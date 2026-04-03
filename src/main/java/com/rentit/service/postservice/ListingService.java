@@ -21,6 +21,7 @@ import com.rentit.service.media.ImageStorageService;
 import com.rentit.service.savedpostservice.SavedPostService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +36,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ListingService {
 
@@ -58,6 +60,7 @@ public class ListingService {
 
     @Transactional
     public void createRoomListing(Principal principal, RoomListingRequest request, List<MultipartFile> images) throws IOException {
+        log.info("DB call for fetching the user");
         UserEntity userEntity = getUserFromPrincipal(principal);
 
         RoomListing room = new RoomListing();
@@ -76,11 +79,13 @@ public class ListingService {
         room.setImageUrls(imageUrls);
 
         room.setUser(userEntity);
+        log.info("DB call for creating the room post");
         roomListingRepository.save(room);
     }
 
     @Transactional
     public void createRoommateListing(Principal principal, RoommateListingRequest request, List<MultipartFile> images) throws IOException {
+        log.info("DB call for fetching the user");
         UserEntity user = getUserFromPrincipal(principal);
 
         RoommateListing roommatePost = new RoommateListing();
@@ -102,6 +107,7 @@ public class ListingService {
         roommatePost.setImageUrls(imageUrls);
 
         roommatePost.setUser(user);
+        log.info("DB call for creating the roommate post");
         roommateListingRepository.save(roommatePost);
     }
 
@@ -121,7 +127,7 @@ public class ListingService {
     }
 
     public RoomListingDto getRoomById(Long id, Principal principal) {
-
+        log.info("DB call for getting the single room post by id");
         RoomListing room = roomListingRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Room not found"));
 
@@ -129,6 +135,7 @@ public class ListingService {
     }
 
     public RoommateListingDto getRoommateById(Long id, Principal principal) {
+        log.info("DB call for getting the single roommate post by id");
         RoommateListing roommate = roommateListingRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Roommate not found"));
         return mapToRoommateDto(roommate, principal);
@@ -153,6 +160,7 @@ public class ListingService {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
         // Fetch paginated data from DB
+        log.info("DB call for getting the room post by applying the filter");
         Page<RoomListing> roomPage = roomListingRepository.findFilteredRooms(
                 query, bhk, min, max, furnish, park, water, elec,pageable);
 
@@ -183,6 +191,7 @@ public class ListingService {
 
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
+        log.info("DB call for getting the roommate post by applying the filter");
         Page<RoommateListing> roommatePage = roommateListingRepository.findFilteredRoommates(
                 query, bhk, gender, diet, religion, min, max, furnish, park, water, elec,pageable);
 
@@ -201,38 +210,48 @@ public class ListingService {
     }
 
     public List<RoomListingDto> getMyRooms(Principal principal) {
+        log.info("DB call for fetching the user");
         UserEntity user = getUserFromPrincipal(principal);
 
+        log.info("DB call for fetching the room post of particular user");
         return roomListingRepository.findByUser(user).stream()
                 .map((RoomListing entity) -> mapToRoomDto(entity, principal)).collect(Collectors.toList());
     }
 
     public List<RoommateListingDto> getMyRoommates(Principal principal) {
+        log.info("DB call for fetching the user");
         UserEntity user = getUserFromPrincipal(principal);
 
+        log.info("DB call for fetching the roommate post of particular user");
         return roommateListingRepository.findByUser(user).stream()
                 .map((RoommateListing entity) -> mapToRoommateDto(entity, principal)).collect(Collectors.toList());
     }
 
     public void deleteRoom(Long id, Principal principal) {
+        log.info("DB call for fetching the room post by id");
         RoomListing room = roomListingRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Room not found"));
 
+        log.info("DB call for getting the user from the room post entity");
         if(!room.getUser().getEmail().equals(principal.getName())) {
             throw new RuntimeException("Unauthorized to delete this post");
         }
 
+        log.info("DB call for deleting the room post");
         roomListingRepository.delete(room);
     }
 
     public void deleteRoommate(Long id, Principal principal) {
+        log.info("DB call for fetching the roommate post by id");
         RoommateListing roommate = roommateListingRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Roommate not found"));
 
+        log.info("DB call for getting the user from the roommate post entity");
         if(!roommate.getUser().getEmail().equals(principal.getName())) {
             throw new RuntimeException("Unauthorized to delete this post");
         }
 
+        log.info("DB call for deleting the room post");
         roommateListingRepository.delete(roommate);
     }
 
