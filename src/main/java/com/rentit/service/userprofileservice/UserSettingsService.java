@@ -7,11 +7,13 @@ import com.rentit.exception.ResourceNotFoundException;
 import com.rentit.repository.user.UserRepository;
 import com.rentit.repository.user.UserSettingsRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class UserSettingsService {
 
@@ -20,6 +22,7 @@ public class UserSettingsService {
     private final UserSettingsRepository userSettingsRepository;
 
     private UserEntity getUser(Principal principal) {
+        log.info("DB call for fetching the user");
         return userRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
@@ -27,6 +30,7 @@ public class UserSettingsService {
     // Get settings, or create default ones if they don't exist yet
     public UserSettingsDto getSettings(Principal principal) {
         UserEntity user = getUser(principal);
+        log.info("DB call for fetching the user settings");
         UserSettings settings = userSettingsRepository.findByUser(user)
                 .orElseGet(() -> createDefaultSettings(user));
         return mapToDto(settings);
@@ -34,6 +38,7 @@ public class UserSettingsService {
 
     public UserSettingsDto updateSettings(Principal principal, UserSettingsDto dto) {
         UserEntity user = getUser(principal);
+        log.info("DB call for fetching the user settings");
         UserSettings settings = userSettingsRepository.findByUser(user)
                 .orElseGet(() -> createDefaultSettings(user));
 
@@ -44,6 +49,7 @@ public class UserSettingsService {
         settings.setNewRoomMatches(dto.isNewRoomMatches());
         settings.setPromotionalOffers(dto.isPromotionalOffers());
 
+        log.info("DB call for saving the user settings");
         userSettingsRepository.save(settings);
         return mapToDto(settings);
     }
@@ -51,6 +57,7 @@ public class UserSettingsService {
     private UserSettings createDefaultSettings(UserEntity user) {
         UserSettings settings = new UserSettings();
         settings.setUser(user);
+        log.info("DB call for saving the user settings");
         return userSettingsRepository.save(settings);
     }
 

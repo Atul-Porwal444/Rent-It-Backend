@@ -50,7 +50,7 @@ public class SavedPostService {
         UserEntity user = getUserFromPrincipal(principal);
 
         log.info("DB call for fetching the room by id");
-        RoomListing room = roomListingRepository.findById(postId)
+        RoomListing room = roomListingRepository.readById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Room listing not found"));
 
         log.info("DB call for checking the room post saved the user or not");
@@ -61,7 +61,7 @@ public class SavedPostService {
         UserEntity user = getUserFromPrincipal(principal);
 
         log.info("DB call for fetching the roommate by id");
-        RoommateListing roommate = roommateListingRepository.findById(postId)
+        RoommateListing roommate = roommateListingRepository.readById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Roommate listing not found"));
 
         log.info("DB call for checking the roommate post saved the user or not");
@@ -72,7 +72,7 @@ public class SavedPostService {
         UserEntity user = getUserFromPrincipal(principal);
 
         log.info("DB call for fetching the room by id");
-        RoomListing room = roomListingRepository.findById(postId).orElseThrow(() ->
+        RoomListing room = roomListingRepository.readById(postId).orElseThrow(() ->
                 new ResourceNotFoundException("Room post Not Found"));
 
         log.info("DB call for fetching the room post saved by user or not");
@@ -95,7 +95,7 @@ public class SavedPostService {
         UserEntity user = getUserFromPrincipal(principal);
 
         log.info("DB call for fetching the roommate by id");
-        RoommateListing roommate = roommateListingRepository.findById(postId).orElseThrow(() ->
+        RoommateListing roommate = roommateListingRepository.readById(postId).orElseThrow(() ->
                 new ResourceNotFoundException("Roommate post Not Found"));
 
         log.info("DB call for fetching the roommate post saved by user or not");

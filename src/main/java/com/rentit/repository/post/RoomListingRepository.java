@@ -4,28 +4,24 @@ import com.rentit.entity.post.RoomListing;
 import com.rentit.entity.user.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RoomListingRepository extends JpaRepository<RoomListing, Long> {
 
-    // Help to filter the rooms that are from the particular city
-    List<RoomListing> findByCity(String city);
+    @EntityGraph(attributePaths = {"imageUrls", "user"})
+    Optional<RoomListing> findById(Long id);
 
-    // Help to filter the rooms with price filter
-    List<RoomListing> findByRentAmountLessThanEqual(double maxPrice);
+    Optional<RoomListing> readById(Long id);
 
-    // Help to filter the rooms based on the need for the BKHs
-    List<RoomListing> findByBhkTypeAndAvailabilityStatus(String bhkType, String availabilityStatus);
-
-    // Help to filter the rooms with city and amount
-    List<RoomListing> findByCityAndRentAmountLessThanEqual(String city, double maxPrice);
-
+    @EntityGraph(attributePaths = {"imageUrls", "user"})
     @Query("SELECT r FROM RoomListing r WHERE " +
             "(:query IS NULL OR :query = '' OR LOWER(r.city) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(r.location) LIKE LOWER(CONCAT('%', :query, '%'))) " +
             "AND (:bhk IS NULL OR :bhk = '' OR r.bhkType = :bhk) " +

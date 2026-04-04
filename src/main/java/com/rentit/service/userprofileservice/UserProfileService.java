@@ -11,6 +11,7 @@ import com.rentit.repository.user.UserProfileRepository;
 import com.rentit.repository.user.UserRepository;
 import com.rentit.service.media.ImageStorageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.security.Principal;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class UserProfileService {
 
@@ -31,8 +33,8 @@ public class UserProfileService {
     private final UserProfileRepository userProfileRepository;
 
     private UserEntity getUserFromPrincipal(Principal principal) {
-        String email = principal.getName();
-        return userRepository.findByEmail(email).
+        log.info("DB call for fetching the user");
+        return userRepository.findByEmail(principal.getName()).
                 orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
@@ -52,6 +54,7 @@ public class UserProfileService {
         userProfileDto.setName(userEntity.getName());
         userProfileDto.setEmail(userEntity.getEmail());
 
+        log.info("DB call for fetching the user profile from the user entity");
         UserProfileEntity userProfileEntity = userEntity.getProfile();
         userProfileDto.setPhone(userProfileEntity.getPhone());
         userProfileEntity.setGender(userProfileEntity.getGender());
@@ -78,26 +81,24 @@ public class UserProfileService {
     public void changePassword(PasswordChangeRequest passwordChangeRequest, Principal principal) {
         UserEntity user = getUserFromPrincipal(principal);
 
-        System.out.println(user.getPassword() + " " + passwordEncoder.encode(passwordChangeRequest.getOldPassword()));
-
         if(!passwordEncoder.matches(passwordChangeRequest.getOldPassword(), user.getPassword())) {
             throw new RuntimeException("Old password does not match");
         }
 
         user.setPassword(passwordEncoder.encode(passwordChangeRequest.getNewPassword()));
-
+        log.info("DB call for saving the user");
         userRepository.save(user);
     }
 
     public void deleteAccount(Principal principal) {
         UserEntity user = getUserFromPrincipal(principal);
+        log.info("DB call for deleting the user");
         userRepository.delete(user);
     }
 
 
     public void updateUserProfile(Principal principal, UserProfileUpdateRequest request) {
-        System.out.println(request.getDob());
-        
+
         UserEntity user = getUserFromPrincipal(principal);
         
         if(request.getName() != null && !request.getName().isEmpty()) user.setName(request.getName());
@@ -116,7 +117,7 @@ public class UserProfileService {
         if(request.getDob() != null && !request.getDob().isEmpty()) profile.setDob(request.getDob());
         
         user.setProfile(profile);
-        
+        log.info("DB call for saving the user");
         userRepository.save(user);
     }
 
@@ -126,6 +127,7 @@ public class UserProfileService {
         String publicUrl = imageStorageService.uploadImage(file);
 
         userEntity.setProfileImageUrl(publicUrl);
+        log.info("DB call for saving the user");
         userRepository.save(userEntity);
 
         return publicUrl;

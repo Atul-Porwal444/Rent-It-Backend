@@ -1,6 +1,7 @@
 package com.rentit.service;
 
 import com.rentit.entity.user.UserEntity;
+import com.rentit.repository.UserAuthProjection;
 import com.rentit.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,13 +20,13 @@ public class CustomUserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        log.info("Loading UserDetails for username: {}", username);
-        UserEntity userEntity = userRepository.findByEmail(username).
-                orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        log.info("DB call for fetching UserAuthProjection");
+        UserAuthProjection projection = userRepository.getByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         return User.builder()
-                .username(userEntity.getEmail())
-                .password(userEntity.getPassword())
+                .username(projection.getEmail())
+                .password(projection.getPassword())
                 .build();
     }
 

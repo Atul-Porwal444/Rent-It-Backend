@@ -5,28 +5,24 @@ import com.rentit.entity.post.RoommateListing;
 import com.rentit.entity.user.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RoommateListingRepository extends JpaRepository<RoommateListing, Long> {
 
-    // Find roommates in a specific city
-    List<RoommateListing> findByCity(String city);
+    @EntityGraph(attributePaths = {"imageUrls", "user"})
+    Optional<RoommateListing> findById(Long id);
 
-    // Find posts looking for a specific gender
-    List<RoommateListing> findByLookingForGender(String gender);
+    Optional<RoommateListing> readById(Long id);
 
-    // Find by City and specific gender requirement
-    List<RoommateListing> findByCityAndLookingForGender(String city, String gender);
-
-    // Find the post according to the relevant diet
-    List<RoommateListing> findByDietaryPreference(String preference);
-
+    @EntityGraph(attributePaths = {"imageUrls", "user"})
     @Query("SELECT r FROM RoommateListing r WHERE " +
             "(:query IS NULL OR :query = '' OR LOWER(r.city) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(r.location) LIKE LOWER(CONCAT('%', :query, '%'))) " +
             "AND (:bhk IS NULL OR :bhk = '' OR r.bhkType = :bhk) " +

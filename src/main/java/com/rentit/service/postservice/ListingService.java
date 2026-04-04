@@ -265,11 +265,13 @@ public class ListingService {
             dto.setSavedByUser(savedRoomPostRepository.findByUserAndRoomListing(getUserFromPrincipal(principal), entity).isPresent());
 
         // Mapping the owner detail
+        log.info("DB call for fetching the user from the room post entity");
         if (entity.getUser() != null) {
             dto.setUserId(entity.getUser().getId());
             dto.setUserName(entity.getUser().getName());
             dto.setUserProfileImageUrl(entity.getUser().getProfileImageUrl());
 
+            log.info("DB call for fetching the user setting from the room post entity");
             if(entity.getUser().getUserSettings() != null) {
                 dto.setShowEmail(entity.getUser().getUserSettings().isShowEmail());
                 dto.setShowPhone(entity.getUser().getUserSettings().isShowPhone());
@@ -294,11 +296,13 @@ public class ListingService {
         if(principal != null)
             dto.setSavedByUser(savedRoommatePostRepository.findByUserAndRoommateListing(getUserFromPrincipal(principal), entity).isPresent());
 
+        log.info("DB call for fetching the user from the roommate post entity");
         if (entity.getUser() != null) {
             dto.setUserId(entity.getUser().getId());
             dto.setUserName(entity.getUser().getName());
             dto.setUserProfileImageUrl(entity.getUser().getProfileImageUrl());
 
+            log.info("DB call for fetching the user setting from the roommate post entity");
             if(entity.getUser().getUserSettings() != null) {
                 dto.setShowEmail(entity.getUser().getUserSettings().isShowEmail());
                 dto.setShowPhone(entity.getUser().getUserSettings().isShowPhone());

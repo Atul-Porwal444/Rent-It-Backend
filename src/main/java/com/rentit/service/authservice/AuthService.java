@@ -8,6 +8,7 @@ import com.rentit.payload.request.auth.LoginRequest;
 import com.rentit.payload.request.auth.ResetPasswordRequest;
 import com.rentit.payload.request.auth.SignupRequest;
 import com.rentit.payload.request.auth.VerificationRequest;
+import com.rentit.repository.UserAuthProjection;
 import com.rentit.repository.auth.VerificationTokenRepository;
 import com.rentit.repository.user.UserRepository;
 import com.rentit.service.EmailService;
@@ -46,8 +47,8 @@ public class AuthService {
 
     @Transactional
     public void registerUser(SignupRequest signupRequest) {
-        log.info("DB call for verifying the user");
-        if(userRepository.findByEmail(signupRequest.getEmail()).isPresent()){
+        log.info("DB call for fetching the UserAuthProjection");
+        if(userRepository.getByEmail(signupRequest.getEmail()).isPresent()){
             throw new RuntimeException("Email Already Exists");
         }
 
@@ -69,7 +70,7 @@ public class AuthService {
         userProfileEntity.setUser(userEntity);
         userEntity.setProfile(userProfileEntity);
 
-        log.info("DB call for saving the user");
+        log.info("DB call for saving the user along with the profile data");
         userRepository.save(userEntity);
 
         String otp = String.valueOf(new Random().nextInt(900000)+100000);
@@ -154,10 +155,10 @@ public class AuthService {
 
     public boolean isAccountVerified(String email) {
         log.info("DB call for fetching the user");
-        UserEntity user = userRepository.findByEmail(email)
+        UserAuthProjection projection = userRepository.getByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User with this email not found"));
 
-        return user.isVerified();
+        return projection.getIsVerified();
     }
 
     public void processForgotPassword(String email) {
