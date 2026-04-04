@@ -169,8 +169,7 @@ public class AuthService {
         String otp = String.valueOf(new Random().nextInt(900000)+100000);
 
         log.info("DB call for fetching the OTP");
-        VerificationToken token = verificationTokenRepository.findByUser(user)
-                .orElse(new VerificationToken());
+        VerificationToken token = user.getVerificationToken() == null ? new VerificationToken() : user.getVerificationToken();
 
         token.setUser(user);
         token.setOtp(otp);
@@ -187,9 +186,10 @@ public class AuthService {
         UserEntity user = userRepository.findByEmail(resetPasswordRequest.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("User with this email not found"));
 
-        log.info("DB call for fetching the OTP");
-        VerificationToken token = verificationTokenRepository.findByUser(user)
-                .orElseThrow(() -> new ResourceNotFoundException("No password reset request found for this user."));
+        log.info("DB call for fetching the token from the user entity");
+        VerificationToken token = user.getVerificationToken();
+        if(token == null)
+            throw new ResourceNotFoundException("No password reset request found for this user.");
 
         if(!token.getOtp().equals(resetPasswordRequest.getOtp())) {
             throw new RuntimeException("Invalid OTP");
@@ -203,10 +203,8 @@ public class AuthService {
         log.info("DB call for saving the user");
         userRepository.save(user);
 
-        token.setOtp(null);
-        token.setExpiryDate(null);
-        log.info("DB call for saving the OTP");
-        verificationTokenRepository.save(token);
+        log.info("DB call for deleting the OTP");
+        verificationTokenRepository.delete(token);
     }
 
     public void resendForgotPasswordOtp(String email) {
@@ -216,9 +214,8 @@ public class AuthService {
 
         String otp = String.valueOf(new Random().nextInt(900000)+100000);
 
-        log.info("DB call for fetching the OTP");
-        VerificationToken token = verificationTokenRepository.findByUser(user)
-                .orElse(null);
+        log.info("DB call for fetching the token from the user entity");
+        VerificationToken token = user.getVerificationToken();
 
         if(token == null) {
             token = new VerificationToken();
