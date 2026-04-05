@@ -119,7 +119,7 @@ public class SavedPostService {
 
         log.info("DB call for fetching the saved rooms by user");
         return savedRoomPostRepository.findByUser(user).stream()
-                .map(saved -> listingService.mapToRoomDto(saved.getRoomListing(), principal))
+                .map(saved -> listingService.mapToRoomDto(saved.getRoomListing(), user))
                 .collect(Collectors.toList());
     }
 
@@ -128,7 +128,7 @@ public class SavedPostService {
 
         log.info("DB call for fetching the saved roommates by user");
         return savedRoommatePostRepository.findByUser(user).stream()
-                .map(saved -> listingService.mapToRoommateDto(saved.getRoommateListing(), principal))
+                .map(saved -> listingService.mapToRoommateDto(saved.getRoommateListing(), user))
                 .collect(Collectors.toList());
     }
 }

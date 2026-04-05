@@ -40,7 +40,7 @@ public class ListingController {
 
             listingService.createRoomListing(principal, roomListingRequest, files);
 
-            return ResponseEntity.ok(new ApiResponse(true, "Post successfully",  roomListingRequest));
+            return ResponseEntity.ok(new ApiResponse(true, "Post successfully",  null));
 
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(500).body(new ApiResponse(false, "Post unsuccessful" + e.getMessage(), null));
@@ -55,7 +55,7 @@ public class ListingController {
 
             listingService.createRoommateListing(principal, roommateListingRequest, files);
 
-            return ResponseEntity.ok(new ApiResponse(true, "Post successfully",  roommateListingRequest));
+            return ResponseEntity.ok(new ApiResponse(true, "Post successfully",  null));
 
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(500).body(new ApiResponse(false, "Post unsuccessful" + e.getMessage(), null));

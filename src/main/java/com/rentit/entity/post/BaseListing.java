@@ -3,7 +3,8 @@ package com.rentit.entity.post;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,12 +18,9 @@ public abstract class BaseListing {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // this will create a table containing two field listId as F.K and image url
-    @ElementCollection
-    @CollectionTable(
-            joinColumns = @JoinColumn(name = "listing_id")
-    )
-    @Column(name = "image_url")
+    // this will store the image url in the array
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "image_url", columnDefinition = "jsonb")
     private List<String> imageUrls = new ArrayList<>();
 
     private String location;
