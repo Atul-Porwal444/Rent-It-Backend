@@ -21,6 +21,13 @@ public interface RoomListingRepository extends JpaRepository<RoomListing, Long> 
 
     Optional<RoomListing> readById(Long id);
 
+    @Query("SELECT r FROM RoomListing r " +
+            "ORDER BY CASE " +
+            "  WHEN (:city IS NOT NULL AND :city != '' AND LOWER(r.city) = LOWER(:city)) THEN 0 " +
+            "  ELSE 1 " +
+            "END ASC")
+    Page<RoomListing> findCardByCity(@Param("city")String city, Pageable pageable);
+
     @EntityGraph(attributePaths = {"imageUrls", "user"})
     @Query("SELECT r FROM RoomListing r WHERE " +
             "(:query IS NULL OR :query = '' OR LOWER(r.city) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(r.location) LIKE LOWER(CONCAT('%', :query, '%'))) " +

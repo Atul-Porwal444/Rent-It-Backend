@@ -1,6 +1,5 @@
 package com.rentit.service.savedpostservice;
 
-import com.rentit.dto.ListingCardDto;
 import com.rentit.entity.post.RoomListing;
 import com.rentit.entity.post.RoommateListing;
 import com.rentit.entity.saved.SavedRoomPost;
@@ -115,21 +114,21 @@ public class SavedPostService {
         }
     }
 
-    public List<ListingCardDto> getSavedRoomsForUser(Principal principal) {
+    public List<RoomListingDto> getSavedRoomsForUser(Principal principal) {
         UserEntity user = getUserFromPrincipal(principal);
 
         log.info("DB call for fetching the saved rooms by user");
         return savedRoomPostRepository.findByUser(user).stream()
-                .map(saved -> listingService.mapToRoomCardDto(saved.getRoomListing()))
+                .map(saved -> listingService.mapToRoomDto(saved.getRoomListing(), user, false))
                 .collect(Collectors.toList());
     }
 
-    public List<ListingCardDto> getSavedRoommatesForUser(Principal principal) {
+    public List<RoommateListingDto> getSavedRoommatesForUser(Principal principal) {
         UserEntity user = getUserFromPrincipal(principal);
 
         log.info("DB call for fetching the saved roommates by user");
         return savedRoommatePostRepository.findByUser(user).stream()
-                .map(saved -> listingService.mapToRoommateCardDto(saved.getRoommateListing()))
+                .map(saved -> listingService.mapToRoommateDto(saved.getRoommateListing(), user, false))
                 .collect(Collectors.toList());
     }
 }

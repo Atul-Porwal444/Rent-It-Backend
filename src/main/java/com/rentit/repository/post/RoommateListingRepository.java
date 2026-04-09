@@ -22,6 +22,13 @@ public interface RoommateListingRepository extends JpaRepository<RoommateListing
 
     Optional<RoommateListing> readById(Long id);
 
+    @Query("SELECT r FROM RoommateListing r " +
+            "ORDER BY CASE " +
+            "  WHEN (:city IS NOT NULL AND :city != '' AND LOWER(r.city) = LOWER(:city)) THEN 0 " +
+            "  ELSE 1 " +
+            "END ASC")
+    Page<RoommateListing> findCardByCity(@Param("city")String city, Pageable pageable);
+
     @EntityGraph(attributePaths = {"imageUrls", "user"})
     @Query("SELECT r FROM RoommateListing r WHERE " +
             "(:query IS NULL OR :query = '' OR LOWER(r.city) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(r.location) LIKE LOWER(CONCAT('%', :query, '%'))) " +

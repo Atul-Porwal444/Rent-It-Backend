@@ -1,5 +1,6 @@
 package com.rentit.controller.postcontroller;
 
+import com.rentit.dto.ListingCardDto;
 import com.rentit.exception.BadRequestException;
 import com.rentit.exception.ResourceNotFoundException;
 import com.rentit.payload.request.post.RoomListingRequest;
@@ -80,6 +81,24 @@ public class ListingController {
     @GetMapping("/my-roommates")
     public ResponseEntity<List<RoommateListingDto>> getMyRoommates(Principal principal) {
         return ResponseEntity.ok(listingService.getMyRoommates(principal));
+    }
+
+    @GetMapping("/room-cards")
+    public ResponseEntity<List<ListingCardDto>> getRoomCards(
+            @RequestParam(value = "targetCity", required = false, defaultValue = "")String targetCity,
+            @RequestParam(value = "pageNo", required = false, defaultValue = "0")int pageNo,
+            @RequestParam(value = "pageSize", required = false, defaultValue = "4")int pageSize
+    ) {
+        return ResponseEntity.ok(listingService.getRoomCards(targetCity, pageNo, pageSize));
+    }
+
+    @GetMapping("/roommate-cards")
+    public ResponseEntity<List<ListingCardDto>> getRoommateCards(
+            @RequestParam(value = "targetCity", required = false, defaultValue = "") String targetCity,
+            @RequestParam(value = "pageNo", required = false, defaultValue = "0")int pageNo,
+            @RequestParam(value = "pageSize", required = false, defaultValue = "4")int pageSize
+    ) {
+        return ResponseEntity.ok(listingService.getRoommateCards(targetCity, pageNo, pageSize));
     }
 
     @DeleteMapping("/rooms/{id}")
