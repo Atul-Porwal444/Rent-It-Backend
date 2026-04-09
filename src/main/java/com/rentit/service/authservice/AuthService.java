@@ -57,7 +57,7 @@ public class AuthService {
         userEntity.setTargetCity(signupRequest.getTargetCity());
         userEntity.setEmail(signupRequest.getEmail());
         userEntity.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
-        userEntity.setProfileImageUrl(DEFAULT_AVATAR);
+        userEntity.setProfileImageUrl(DEFAULT_AVATAR + signupRequest.getName());
         userEntity.setVerified(false);
 
         UserProfileEntity userProfileEntity = new UserProfileEntity();
@@ -137,15 +137,16 @@ public class AuthService {
 
     public String loginUser(LoginRequest loginRequest) {
 
-        if(!isAccountVerified(loginRequest.getEmail())) {
-            throw new AccessDeniedException("Account is not verified");
-        }
-
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
         );
 
         if (authentication.isAuthenticated()) {
+
+            if(!isAccountVerified(loginRequest.getEmail())) {
+                throw new AccessDeniedException("Account is not verified");
+            }
+
             String token = jwtUtil.generateToken(loginRequest.getEmail());
             return token;
         } else {

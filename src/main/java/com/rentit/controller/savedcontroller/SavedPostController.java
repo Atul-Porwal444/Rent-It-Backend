@@ -1,5 +1,6 @@
 package com.rentit.controller.savedcontroller;
 
+import com.rentit.dto.ListingCardDto;
 import com.rentit.payload.response.ApiResponse;
 import com.rentit.payload.response.post.RoomListingDto;
 import com.rentit.payload.response.post.RoommateListingDto;
@@ -55,12 +56,12 @@ public class SavedPostController {
     }
 
     @GetMapping("/rooms")
-    public ResponseEntity<List<RoomListingDto>> getMySavedRooms(Principal principal) {
+    public ResponseEntity<List<ListingCardDto>> getMySavedRooms(Principal principal) {
         return ResponseEntity.ok(savedPostService.getSavedRoomsForUser(principal));
     }
 
     @GetMapping("/roommates")
-    public ResponseEntity<List<RoommateListingDto>> getMySavedRoommates(Principal principal) {
+    public ResponseEntity<List<ListingCardDto>> getMySavedRoommates(Principal principal) {
         return ResponseEntity.ok(savedPostService.getSavedRoommatesForUser(principal));
     }
 
