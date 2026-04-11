@@ -19,7 +19,6 @@ import java.util.List;
 public class RoomListing extends BaseListing {
 
     private double securityDeposit;
-    private String availabilityStatus; // "Available", "Booked"
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

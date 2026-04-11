@@ -19,6 +19,8 @@ public abstract class BaseListingDto {
     private int floorNumber;
     private double rentAmount;
 
+    private boolean availabilityStatus;
+
     private boolean hasParking;
     private boolean isFurnished;
     private boolean waterSupply24x7;

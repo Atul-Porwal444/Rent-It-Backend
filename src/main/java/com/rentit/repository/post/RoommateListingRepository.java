@@ -30,18 +30,20 @@ public interface RoommateListingRepository extends JpaRepository<RoommateListing
     Page<RoommateListing> findCardByCity(@Param("city")String city, Pageable pageable);
 
     @EntityGraph(attributePaths = {"imageUrls", "user"})
-    @Query("SELECT r FROM RoommateListing r WHERE " +
-            "(:query IS NULL OR :query = '' OR LOWER(r.city) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(r.location) LIKE LOWER(CONCAT('%', :query, '%'))) " +
-            "AND (:bhk IS NULL OR :bhk = '' OR r.bhkType = :bhk) " +
-            "AND (:gender IS NULL OR :gender = '' OR r.lookingForGender = :gender) " +
-            "AND (:diet IS NULL OR :diet = '' OR r.dietaryPreference = :diet) " +
-            "AND (:religion IS NULL OR :religion = '' OR r.religionPreference = :religion) " +
-            "AND (:min IS NULL OR r.rentAmount >= :min) " +
-            "AND (:max IS NULL OR r.rentAmount <= :max) " +
-            "AND (:furnish = false OR r.isFurnished = true) " +
-            "AND (:park = false OR r.hasParking = true) " +
-            "AND (:water = false OR r.waterSupply24x7 = true) " +
-            "AND (:elec = false OR r.electricityBackup = true)")
+    @Query("SELECT r FROM RoommateListing r " +
+            "ORDER BY CASE WHEN (" +
+            "    (:query IS NULL OR :query = '' OR LOWER(r.city) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(r.location) LIKE LOWER(CONCAT('%', :query, '%'))) " +
+            "    AND (:bhk IS NULL OR :bhk = '' OR r.bhkType = :bhk) " +
+            "    AND (:gender IS NULL OR :gender = '' OR r.lookingForGender = :gender) " +
+            "    AND (:diet IS NULL OR :diet = '' OR r.dietaryPreference = :diet) " +
+            "    AND (:religion IS NULL OR :religion = '' OR r.religionPreference = :religion) " +
+            "    AND (:min IS NULL OR r.rentAmount >= :min) " +
+            "    AND (:max IS NULL OR r.rentAmount <= :max) " +
+            "    AND (:furnish = false OR r.isFurnished = true) " +
+            "    AND (:park = false OR r.hasParking = true) " +
+            "    AND (:water = false OR r.waterSupply24x7 = true) " +
+            "    AND (:elec = false OR r.electricityBackup = true) " +
+            ") THEN 0 ELSE 1 END ASC")
     Page<RoommateListing> findFilteredRoommates(
             @Param("query") String query,
             @Param("bhk") String bhk,

@@ -8,5 +8,4 @@ import lombok.EqualsAndHashCode;
 public class RoomListingDto extends BaseListingDto{
 
     private double securityDeposit;
-    private String availabilityStatus;
 }

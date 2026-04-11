@@ -34,6 +34,8 @@ public abstract class BaseListing {
 
     private String bhkType;
 
+    private boolean availabilityStatus;
+
     private int floorNumber;
     private boolean hasParking;
     private boolean isFurnished;

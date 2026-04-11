@@ -29,15 +29,17 @@ public interface RoomListingRepository extends JpaRepository<RoomListing, Long> 
     Page<RoomListing> findCardByCity(@Param("city")String city, Pageable pageable);
 
     @EntityGraph(attributePaths = {"imageUrls", "user"})
-    @Query("SELECT r FROM RoomListing r WHERE " +
-            "(:query IS NULL OR :query = '' OR LOWER(r.city) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(r.location) LIKE LOWER(CONCAT('%', :query, '%'))) " +
-            "AND (:bhk IS NULL OR :bhk = '' OR r.bhkType = :bhk) " +
-            "AND (:min IS NULL OR r.rentAmount >= :min) " +
-            "AND (:max IS NULL OR r.rentAmount <= :max) " +
-            "AND (:furnish = false OR r.isFurnished = true) " +
-            "AND (:park = false OR r.hasParking = true) " +
-            "AND (:water = false OR r.waterSupply24x7 = true) " +
-            "AND (:elec = false OR r.electricityBackup = true)")
+    @Query("SELECT r FROM RoomListing r " +
+            "ORDER BY CASE WHEN (" +
+            "    (:query IS NULL OR :query = '' OR LOWER(r.city) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(r.location) LIKE LOWER(CONCAT('%', :query, '%'))) " +
+            "    AND (:bhk IS NULL OR :bhk = '' OR r.bhkType = :bhk) " +
+            "    AND (:min IS NULL OR r.rentAmount >= :min) " +
+            "    AND (:max IS NULL OR r.rentAmount <= :max) " +
+            "    AND (:furnish = false OR r.isFurnished = true) " +
+            "    AND (:park = false OR r.hasParking = true) " +
+            "    AND (:water = false OR r.waterSupply24x7 = true) " +
+            "    AND (:elec = false OR r.electricityBackup = true) " +
+            ") THEN 0 ELSE 1 END ASC")
     Page<RoomListing> findFilteredRooms(
             @Param("query") String query,
             @Param("bhk") String bhk,

@@ -68,7 +68,6 @@ public class ListingService {
         mapBaseFields(request, room);
 
         room.setSecurityDeposit(request.getSecurityDeposit());
-        room.setAvailabilityStatus(request.getAvailabilityStatus());
 
         List<String> imageUrls = new ArrayList<>();
         for(MultipartFile file : images) {
@@ -117,6 +116,7 @@ public class ListingService {
         listing.setPincode(request.getPincode());
         listing.setDescription(request.getDescription());
         listing.setBhkType(request.getBhkType());
+        listing.setAvailabilityStatus(true);
         listing.setFloorNumber(request.getFloorNumber());
         listing.setHasParking(request.isHasParking());
         listing.setFurnished(request.isFurnished());
@@ -288,7 +288,6 @@ public class ListingService {
         }
 
         dto.setSecurityDeposit(entity.getSecurityDeposit());
-        dto.setAvailabilityStatus(entity.getAvailabilityStatus());
         return dto;
     }
 
@@ -331,6 +330,7 @@ public class ListingService {
         dto.setDescription(entity.getDescription());
         dto.setBhkType(entity.getBhkType());
         dto.setFloorNumber(entity.getFloorNumber());
+        dto.setAvailabilityStatus(entity.isAvailabilityStatus());
         dto.setHasParking(entity.isHasParking());
         dto.setFurnished(entity.isFurnished());
         dto.setWaterSupply24x7(entity.isWaterSupply24x7());
