@@ -83,6 +83,16 @@ public class ListingController {
         return ResponseEntity.ok(listingService.getMyRoommates(principal));
     }
 
+    @PutMapping("/update-room-status/{id}")
+    public ResponseEntity<Boolean> updateRoomStatus(@PathVariable Long id, Principal principal) {
+        return ResponseEntity.ok(listingService.updateRoomStatus(id, principal));
+    }
+
+    @PutMapping("/update-roommate-status/{id}")
+    public ResponseEntity<Boolean> updateRoommateStatus(@PathVariable Long id, Principal principal) {
+        return ResponseEntity.ok(listingService.updateRoommateStatus(id, principal));
+    }
+
     @GetMapping("/room-cards")
     public ResponseEntity<List<ListingCardDto>> getRoomCards(
             @RequestParam(value = "targetCity", required = false, defaultValue = "")String targetCity,

@@ -5,6 +5,7 @@ import com.rentit.entity.post.BaseListing;
 import com.rentit.entity.post.RoomListing;
 import com.rentit.entity.post.RoommateListing;
 import com.rentit.entity.user.UserEntity;
+import com.rentit.exception.BadRequestException;
 import com.rentit.exception.ResourceNotFoundException;
 import com.rentit.payload.request.post.BaseListingRequest;
 import com.rentit.payload.request.post.RoomListingRequest;
@@ -33,6 +34,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -224,6 +226,54 @@ public class ListingService {
         log.info("DB call for fetching the roommate post of particular user");
         return roommateListingRepository.findByUser(currentUser).stream()
                 .map((RoommateListing entity) -> mapToRoommateDto(entity, currentUser, false)).collect(Collectors.toList());
+    }
+
+    public boolean updateRoomStatus(Long id, Principal principal) {
+        UserEntity currentUser = getUserFromPrincipal(principal);
+
+        RoomListing roomListing = roomListingRepository.readById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Room post not found for this ID"));
+
+        UserEntity owner = roomListing.getUser();
+
+        if(owner != null && Objects.equals(owner.getId(), currentUser.getId())) {
+            if(roomListing.isAvailabilityStatus()) {
+                roomListing.setAvailabilityStatus(false);
+                roomListingRepository.save(roomListing);
+            }
+            else {
+                roomListing.setAvailabilityStatus(true);
+                roomListingRepository.save(roomListing);
+            }
+        }
+        else {
+            throw new BadRequestException("You are not the owner of the room post");
+        }
+        return true;
+    }
+
+    public boolean updateRoommateStatus(Long id, Principal principal) {
+        UserEntity currentUser = getUserFromPrincipal(principal);
+
+        RoommateListing roommateListing = roommateListingRepository.readById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Roommate post not found for this ID"));
+
+        UserEntity owner = roommateListing.getUser();
+
+        if(owner != null && Objects.equals(owner.getId(), currentUser.getId())) {
+            if(roommateListing.isAvailabilityStatus()) {
+                roommateListing.setAvailabilityStatus(false);
+                roommateListingRepository.save(roommateListing);
+            }
+            else {
+                roommateListing.setAvailabilityStatus(true);
+                roommateListingRepository.save(roommateListing);
+            }
+        }
+        else {
+            throw new BadRequestException("You are not the owner of the roommate post");
+        }
+        return true;
     }
 
     public List<ListingCardDto> getRoomCards(String targetCity, int pageNo, int pageSize) {

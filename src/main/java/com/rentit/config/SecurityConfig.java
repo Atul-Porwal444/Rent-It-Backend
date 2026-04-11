@@ -37,7 +37,7 @@ public class SecurityConfig  {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint)) // will work when there is any error while finding the jwt
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/signup","/api/auth/login", "/api/auth/verify-otp", "/api/auth/resend-otp","/api/auth/forgot-password", "/api/auth/reset-password", "/api/auth/resend-fp-otp", "/user/list/room-cards", "/user/list/roommate-cards").permitAll()
+                        .requestMatchers("/api/auth/signup","/api/auth/login", "/api/auth/logout", "/api/auth/verify-otp", "/api/auth/resend-otp","/api/auth/forgot-password", "/api/auth/reset-password", "/api/auth/resend-fp-otp", "/user/list/room-cards", "/user/list/roommate-cards").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(AbstractHttpConfigurer::disable)

@@ -6,7 +6,9 @@ import com.rentit.service.authservice.AuthService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -62,26 +64,31 @@ public class AuthController {
     public ResponseEntity<ApiResponse> login(@RequestBody LoginRequest request, HttpServletResponse servletResponse) {
         String token = authService.loginUser(request);
 
-        Cookie jwtCookie = new Cookie("jwt", token);
-        jwtCookie.setHttpOnly(true); // this will only allow browser to access the cookie, prevention from XSs
-        jwtCookie.setSecure(false); // set true in the production because of https
-        jwtCookie.setPath("/"); // cookie is valid for whole app
-        jwtCookie.setMaxAge(24 * 60 * 60); // for one day
+        ResponseCookie responseCookie = ResponseCookie.from("jwt", token)
+                .httpOnly(true) // this will only allow browser to access the cookie, prevention from XSS
+                .secure(true) // setting true in the production because of https
+                .path("/") // cookie is valid for whole app
+                .maxAge(24 * 60 * 60) // one day validity
+                .sameSite("None") // Allows the cookie to be sent across different domains
+                .build();
 
-        servletResponse.addCookie(jwtCookie);
+        servletResponse.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
 
         return ResponseEntity.ok(new ApiResponse(true, "Login successfully", null));
     }
 
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse> logout(HttpServletResponse servletResponse) {
-        Cookie jwtCookie = new Cookie("jwt", null);
-        jwtCookie.setHttpOnly(true);
-        jwtCookie.setSecure(false);
-        jwtCookie.setPath("/");
-        jwtCookie.setMaxAge(0);
+        ResponseCookie jwtCookie = ResponseCookie.from("jwt", "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(0)
+                .sameSite("None")
+                .build();
 
-        servletResponse.addCookie(jwtCookie);
+        servletResponse.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
+
         return ResponseEntity.ok(new ApiResponse(true, "Logout successfully", null));
     }
 
