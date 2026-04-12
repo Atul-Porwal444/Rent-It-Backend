@@ -62,7 +62,8 @@ public class SecurityConfig  {
     public CorsConfigurationSource corsConfigurationSource() {
         log.info("Setting up CORS configuration");
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200", "https://rent-it-frontend.onrender.com"));
+        configuration.setAllowedOrigins(List.of("http://localhost:4200",
+                "https://rent-it-frontend.onrender.com"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
