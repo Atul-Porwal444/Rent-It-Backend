@@ -53,17 +53,17 @@ public class JwtFilter extends OncePerRequestFilter {
         if(token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             try {
                 username = jwtUtil.extractUsername(token);
-            } catch (Exception e) {
-                throw new ResourceNotFoundException("Invalid token" + e.getMessage());
-            }
 
-            if(username != null) {
-                UserDetails userDetails = customUserDetailService.loadUserByUsername(username);
-                if(jwtUtil.validateToken(token, userDetails)) {
-                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                if(username != null) {
+                    UserDetails userDetails = customUserDetailService.loadUserByUsername(username);
+                    if(jwtUtil.validateToken(token, userDetails)) {
+                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
                 }
+            } catch (Exception e) {
+                logger.warn("JWT Token is invalid or expired: " + e.getMessage());
             }
         }
 
