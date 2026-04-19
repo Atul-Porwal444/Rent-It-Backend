@@ -1,6 +1,5 @@
 package com.rentit.filter;
 
-import com.rentit.exception.ResourceNotFoundException;
 import com.rentit.service.CustomUserDetailService;
 import com.rentit.utility.JwtUtil;
 import jakarta.servlet.FilterChain;

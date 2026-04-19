@@ -1,13 +1,12 @@
 package com.rentit.service.savedpostservice;
 
+import com.rentit.dto.HListingCardDto;
 import com.rentit.entity.post.RoomListing;
 import com.rentit.entity.post.RoommateListing;
 import com.rentit.entity.saved.SavedRoomPost;
 import com.rentit.entity.saved.SavedRoommatePost;
 import com.rentit.entity.user.UserEntity;
 import com.rentit.exception.ResourceNotFoundException;
-import com.rentit.payload.response.post.RoomListingDto;
-import com.rentit.payload.response.post.RoommateListingDto;
 import com.rentit.repository.post.RoomListingRepository;
 import com.rentit.repository.post.RoommateListingRepository;
 import com.rentit.repository.saved.SavedRoomPostRepository;
@@ -114,21 +113,21 @@ public class SavedPostService {
         }
     }
 
-    public List<RoomListingDto> getSavedRoomsForUser(Principal principal) {
+    public List<HListingCardDto> getSavedRoomsForUser(Principal principal) {
         UserEntity user = getUserFromPrincipal(principal);
 
         log.info("DB call for fetching the saved rooms by user");
         return savedRoomPostRepository.findByUser(user).stream()
-                .map(saved -> listingService.mapToRoomDto(saved.getRoomListing(), user, false))
+                .map((SavedRoomPost entity) -> this.listingService.mapToHRoomCardDto(entity.getRoomListing()))
                 .collect(Collectors.toList());
     }
 
-    public List<RoommateListingDto> getSavedRoommatesForUser(Principal principal) {
+    public List<HListingCardDto> getSavedRoommatesForUser(Principal principal) {
         UserEntity user = getUserFromPrincipal(principal);
 
         log.info("DB call for fetching the saved roommates by user");
         return savedRoommatePostRepository.findByUser(user).stream()
-                .map(saved -> listingService.mapToRoommateDto(saved.getRoommateListing(), user, false))
+                .map(saved -> listingService.mapToHRoommateCardDto(saved.getRoommateListing()))
                 .collect(Collectors.toList());
     }
 }

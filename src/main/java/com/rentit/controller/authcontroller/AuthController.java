@@ -3,7 +3,6 @@ package com.rentit.controller.authcontroller;
 import com.rentit.payload.request.auth.*;
 import com.rentit.payload.response.ApiResponse;
 import com.rentit.service.authservice.AuthService;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;

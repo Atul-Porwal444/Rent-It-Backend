@@ -1,6 +1,5 @@
 package com.rentit.service;
 
-import com.rentit.entity.user.UserEntity;
 import com.rentit.repository.UserAuthProjection;
 import com.rentit.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;

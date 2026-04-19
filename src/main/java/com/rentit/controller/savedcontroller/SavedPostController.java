@@ -1,8 +1,7 @@
 package com.rentit.controller.savedcontroller;
 
+import com.rentit.dto.HListingCardDto;
 import com.rentit.payload.response.ApiResponse;
-import com.rentit.payload.response.post.RoomListingDto;
-import com.rentit.payload.response.post.RoommateListingDto;
 import com.rentit.service.savedpostservice.SavedPostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -55,12 +54,12 @@ public class SavedPostController {
     }
 
     @GetMapping("/rooms")
-    public ResponseEntity<List<RoomListingDto>> getMySavedRooms(Principal principal) {
+    public ResponseEntity<List<HListingCardDto>> getMySavedRooms(Principal principal) {
         return ResponseEntity.ok(savedPostService.getSavedRoomsForUser(principal));
     }
 
     @GetMapping("/roommates")
-    public ResponseEntity<List<RoommateListingDto>> getMySavedRoommates(Principal principal) {
+    public ResponseEntity<List<HListingCardDto>> getMySavedRoommates(Principal principal) {
         return ResponseEntity.ok(savedPostService.getSavedRoommatesForUser(principal));
     }
 

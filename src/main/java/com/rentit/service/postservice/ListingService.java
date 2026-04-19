@@ -1,5 +1,6 @@
 package com.rentit.service.postservice;
 
+import com.rentit.dto.HListingCardDto;
 import com.rentit.dto.ListingCardDto;
 import com.rentit.entity.post.BaseListing;
 import com.rentit.entity.post.RoomListing;
@@ -144,7 +145,7 @@ public class ListingService {
         return mapToRoommateDto(roommate, currentUser, true);
     }
 
-    public PagedResponse<RoomListingDto> getAllRooms(
+    public PagedResponse<HListingCardDto> getAllRooms(
             String query, String bhk, Double min, Double max,
             boolean furnish, boolean park, boolean water, boolean elec,int pageNo, int pageSize, String sortBy, String sortDir) {
 
@@ -168,8 +169,8 @@ public class ListingService {
                 query, bhk, min, max, furnish, park, water, elec,pageable);
 
         // Map Entities to DTOs
-        List<RoomListingDto> content = roomPage.getContent().stream()
-                .map((RoomListing entity) -> mapToRoomDto(entity, null, false))
+        List<HListingCardDto> content = roomPage.getContent().stream()
+                .map(this::mapToHRoomCardDto)
                 .collect(Collectors.toList());
 
         // Return Standard Wrapper
@@ -184,7 +185,7 @@ public class ListingService {
 
     }
 
-    public PagedResponse<RoommateListingDto> getAllRoommates(
+    public PagedResponse<HListingCardDto> getAllRoommates(
             String query, String bhk , String gender, String diet, String religion,Double min, Double max,
             boolean furnish, boolean park, boolean water, boolean elec,int pageNo, int pageSize, String sortBy, String sortDir) {
 
@@ -198,8 +199,8 @@ public class ListingService {
         Page<RoommateListing> roommatePage = roommateListingRepository.findFilteredRoommates(
                 query, bhk, gender, diet, religion, min, max, furnish, park, water, elec,pageable);
 
-        List<RoommateListingDto> content = roommatePage.getContent().stream()
-                .map((RoommateListing entity) -> mapToRoommateDto(entity, null, false))
+        List<HListingCardDto> content = roommatePage.getContent().stream()
+                .map(this::mapToHRoommateCardDto)
                 .collect(Collectors.toList());
 
         return new PagedResponse<>(
@@ -212,20 +213,20 @@ public class ListingService {
         );
     }
 
-    public List<RoomListingDto> getMyRooms(Principal principal) {
+    public List<HListingCardDto> getMyRooms(Principal principal) {
         UserEntity currentUser = getUserFromPrincipal(principal);
 
         log.info("DB call for fetching the room post of particular user");
         return roomListingRepository.findByUser(currentUser).stream()
-                .map((RoomListing entity) -> mapToRoomDto(entity, currentUser, false)).collect(Collectors.toList());
+                .map(this::mapToHRoomCardDto).collect(Collectors.toList());
     }
 
-    public List<RoommateListingDto> getMyRoommates(Principal principal) {
+    public List<HListingCardDto> getMyRoommates(Principal principal) {
         UserEntity currentUser = getUserFromPrincipal(principal);
 
         log.info("DB call for fetching the roommate post of particular user");
         return roommateListingRepository.findByUser(currentUser).stream()
-                .map((RoommateListing entity) -> mapToRoommateDto(entity, currentUser, false)).collect(Collectors.toList());
+                .map(this::mapToHRoommateCardDto).collect(Collectors.toList());
     }
 
     public boolean updateRoomStatus(Long id, Principal principal) {
@@ -415,5 +416,41 @@ public class ListingService {
         return dto;
     }
 
+    public HListingCardDto mapToHRoomCardDto(RoomListing entity) {
+        HListingCardDto dto = new HListingCardDto();
+        dto.setId(entity.getId());
+        dto.setAvailabilityStatus(entity.isAvailabilityStatus());
+        dto.setPostedOn(entity.getPostedOn());
+        dto.setRentAmount(entity.getRentAmount());
+        dto.setLocation(entity.getLocation());
+        dto.setCity(entity.getCity());
+        dto.setState(entity.getState());
+        dto.setPincode(entity.getPincode());
+        dto.setFurnished(entity.isFurnished());
+        dto.setHasParking(entity.isHasParking());
 
+        dto.setImageUrls(entity.getImageUrls());
+
+        return dto;
+    }
+
+    public HListingCardDto mapToHRoommateCardDto(RoommateListing entity) {
+        HListingCardDto dto = new HListingCardDto();
+        dto.setId(entity.getId());
+        dto.setAvailabilityStatus(entity.isAvailabilityStatus());
+        dto.setPostedOn(entity.getPostedOn());
+        dto.setRentAmount(entity.getRentAmount());
+        dto.setLocation(entity.getLocation());
+        dto.setCity(entity.getCity());
+        dto.setState(entity.getState());
+        dto.setPincode(entity.getPincode());
+        dto.setCurrentRoommates(entity.getCurrentRoommates());
+        dto.setDietaryPreference(entity.getDietaryPreference());
+        dto.setLookingForGender(entity.getLookingForGender());
+
+        dto.setImageUrls(entity.getImageUrls());
+
+        return dto;
+
+    }
 }

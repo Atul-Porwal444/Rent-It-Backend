@@ -1,5 +1,6 @@
 package com.rentit.controller.postcontroller;
 
+import com.rentit.dto.HListingCardDto;
 import com.rentit.dto.ListingCardDto;
 import com.rentit.exception.BadRequestException;
 import com.rentit.exception.ResourceNotFoundException;
@@ -74,12 +75,12 @@ public class ListingController {
     }
 
     @GetMapping("/my-rooms")
-    public ResponseEntity<List<RoomListingDto>> getMyRooms(Principal principal) {
+    public ResponseEntity<List<HListingCardDto>> getMyRooms(Principal principal) {
         return ResponseEntity.ok(listingService.getMyRooms(principal));
     }
 
     @GetMapping("/my-roommates")
-    public ResponseEntity<List<RoommateListingDto>> getMyRoommates(Principal principal) {
+    public ResponseEntity<List<HListingCardDto>> getMyRoommates(Principal principal) {
         return ResponseEntity.ok(listingService.getMyRoommates(principal));
     }
 
@@ -124,7 +125,7 @@ public class ListingController {
     }
 
     @GetMapping("/rooms")
-    public ResponseEntity<PagedResponse<RoomListingDto>> getRooms(
+    public ResponseEntity<PagedResponse<HListingCardDto>> getRooms(
             @RequestParam(required = false) String searchQuery,
             @RequestParam(required = false) String bhkType,
             @RequestParam(required = false) Double minRent,
@@ -146,7 +147,7 @@ public class ListingController {
     }
 
     @GetMapping("/roommates")
-    public ResponseEntity<PagedResponse<RoommateListingDto>> getRoommates(
+    public ResponseEntity<PagedResponse<HListingCardDto>> getRoommates(
             @RequestParam(required = false) String searchQuery,
             @RequestParam(required = false) String bhkType,
             @RequestParam(required = false) String lookingForGender,

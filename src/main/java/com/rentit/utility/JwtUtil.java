@@ -30,7 +30,7 @@ public class JwtUtil {
 
     private String createToken(String subject) {
         return Jwts.builder()
-                .setClaims(new HashMap<String, Object>())
+                .setClaims(new HashMap<>())
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 Hours
