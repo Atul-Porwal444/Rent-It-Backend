@@ -3,6 +3,7 @@ package com.rentit.controller.authcontroller;
 import com.rentit.payload.request.auth.*;
 import com.rentit.payload.response.ApiResponse;
 import com.rentit.service.authservice.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -77,7 +78,23 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponse> logout(HttpServletResponse servletResponse) {
+    public ResponseEntity<ApiResponse> logout(HttpServletRequest request, HttpServletResponse servletResponse) {
+
+        String token = null;
+
+        if(request.getCookies() != null) {
+            for(jakarta.servlet.http.Cookie cookie : request.getCookies()) {
+                if("jwt".equals(cookie.getName())) {
+                    token = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        if (token != null) {
+            authService.blacklistJwt(token);
+        }
+
         ResponseCookie jwtCookie = ResponseCookie.from("jwt", "")
                 .httpOnly(true)
                 .secure(true)

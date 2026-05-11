@@ -1,6 +1,5 @@
 package com.rentit.service.authservice;
 
-import com.rentit.entity.auth.VerificationToken;
 import com.rentit.entity.user.UserEntity;
 import com.rentit.entity.user.UserProfileEntity;
 import com.rentit.exception.ResourceNotFoundException;
@@ -9,13 +8,13 @@ import com.rentit.payload.request.auth.ResetPasswordRequest;
 import com.rentit.payload.request.auth.SignupRequest;
 import com.rentit.payload.request.auth.VerificationRequest;
 import com.rentit.repository.UserAuthProjection;
-import com.rentit.repository.auth.VerificationTokenRepository;
 import com.rentit.repository.user.UserRepository;
 import com.rentit.service.EmailService;
 import com.rentit.utility.JwtUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,8 +22,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -41,7 +41,7 @@ public class AuthService {
 
     private final AuthenticationManager authenticationManager;
 
-    private final VerificationTokenRepository verificationTokenRepository;
+    private final RedisTemplate<String, String> redisTemplate;
 
     private final String DEFAULT_AVATAR = "https://ui-avatars.com/api/?background=random&name=";
 
@@ -75,13 +75,7 @@ public class AuthService {
 
         String otp = String.valueOf(new Random().nextInt(900000)+100000);
 
-        VerificationToken token = new VerificationToken();
-        token.setOtp(otp);
-        token.setUser(userEntity);
-        token.setExpiryDate(LocalDateTime.now().plusMinutes(10));
-
-        log.info("DB call for saving the OTP");
-        verificationTokenRepository.save(token);
+        redisTemplate.opsForValue().set("OTP:"+signupRequest.getEmail(), otp, 10, TimeUnit.MINUTES);
 
         emailService.sendVerificationEmail(signupRequest.getEmail(), otp);
     }
@@ -91,16 +85,16 @@ public class AuthService {
         UserEntity user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("User with this email not found"));
 
-        log.info("DB call for fetching the OTP from DB");
-        VerificationToken token = verificationTokenRepository.findByUser(user)
-                .orElseThrow(() -> new ResourceNotFoundException("No account verification request found for this user"));
+        if(user.isVerified())
+            throw new RuntimeException("User is already verified");
 
-        if(token.getOtp().equals(request.getOtp()) && token.getExpiryDate().isAfter(LocalDateTime.now())) {
+        String storedOtp = redisTemplate.opsForValue().get("OTP:"+request.getEmail());
+
+        if(storedOtp != null && storedOtp.equals(request.getOtp())) {
             user.setVerified(true);
-            log.info("DB call for saving the user");
             userRepository.save(user);
-            log.info("DB call for deleting the OTP");
-            verificationTokenRepository.delete(token);
+
+            redisTemplate.delete("OTP:"+request.getEmail());
             return true;
         }
 
@@ -118,19 +112,7 @@ public class AuthService {
 
         String otp = String.valueOf(new Random().nextInt(900000)+100000);
 
-        log.info("DB call for fetching the OTP");
-        VerificationToken token = verificationTokenRepository.findByUser(user)
-                .orElse(null);
-
-        if(token == null) {
-            token = new VerificationToken();
-            token.setUser(user);
-        }
-
-        token.setOtp(otp);
-        token.setExpiryDate(LocalDateTime.now().plusMinutes(10));
-        log.info("DB call for saving the OTP");
-        verificationTokenRepository.save(token);
+        redisTemplate.opsForValue().set("OTP:"+email, otp, 10, TimeUnit.MINUTES);
 
         emailService.sendVerificationEmail(email, otp);
     }
@@ -169,15 +151,7 @@ public class AuthService {
 
         String otp = String.valueOf(new Random().nextInt(900000)+100000);
 
-        log.info("DB call for fetching the OTP");
-        VerificationToken token = user.getVerificationToken() == null ? new VerificationToken() : user.getVerificationToken();
-
-        token.setUser(user);
-        token.setOtp(otp);
-        token.setExpiryDate(LocalDateTime.now().plusMinutes(10));
-
-        log.info("DB call for saving the OTP");
-        verificationTokenRepository.save(token);
+        redisTemplate.opsForValue().set("OTP:"+email, otp, 10, TimeUnit.MINUTES);
 
         emailService.sendPasswordResetEmail(email, otp);
     }
@@ -187,25 +161,21 @@ public class AuthService {
         UserEntity user = userRepository.findByEmail(resetPasswordRequest.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("User with this email not found"));
 
-        log.info("DB call for fetching the token from the user entity");
-        VerificationToken token = user.getVerificationToken();
-        if(token == null)
+
+        String storedOtp = redisTemplate.opsForValue().get("OTP:"+resetPasswordRequest.getEmail());
+
+        if(storedOtp == null)
             throw new ResourceNotFoundException("No password reset request found for this user.");
 
-        if(!token.getOtp().equals(resetPasswordRequest.getOtp())) {
+        if(!storedOtp.equals(resetPasswordRequest.getOtp())) {
             throw new RuntimeException("Invalid OTP");
-        }
-
-        if(token.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("OTP has expired. Please request a new one.");
         }
 
         user.setPassword(passwordEncoder.encode(resetPasswordRequest.getNewPassword()));
         log.info("DB call for saving the user");
         userRepository.save(user);
 
-        log.info("DB call for deleting the OTP");
-        verificationTokenRepository.delete(token);
+        redisTemplate.delete("OTP:"+resetPasswordRequest.getEmail());
     }
 
     public void resendForgotPasswordOtp(String email) {
@@ -215,19 +185,22 @@ public class AuthService {
 
         String otp = String.valueOf(new Random().nextInt(900000)+100000);
 
-        log.info("DB call for fetching the token from the user entity");
-        VerificationToken token = user.getVerificationToken();
-
-        if(token == null) {
-            token = new VerificationToken();
-            token.setUser(user);
-        }
-
-        token.setOtp(otp);
-        token.setExpiryDate(LocalDateTime.now().plusMinutes(10));
-        log.info("DB call for saving the OTP");
-        verificationTokenRepository.save(token);
+        redisTemplate.opsForValue().set("OTP:"+email, otp, 10, TimeUnit.MINUTES);
 
         emailService.sendPasswordResetEmail(email, otp);
+    }
+
+    public void blacklistJwt(String token) {
+        Date expirationDate = jwtUtil.extractExpiration(token);
+        long remainingTimeInMillis = expirationDate.getTime() - System.currentTimeMillis();
+
+        if (remainingTimeInMillis > 0) {
+            redisTemplate.opsForValue().set(
+                    "BLACKLIST:" + token,
+                    "logged_out",
+                    remainingTimeInMillis,
+                    java.util.concurrent.TimeUnit.MILLISECONDS
+            );
+        }
     }
 }
