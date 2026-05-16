@@ -14,6 +14,7 @@ import com.rentit.utility.JwtUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -156,6 +157,7 @@ public class AuthService {
         emailService.sendPasswordResetEmail(email, otp);
     }
 
+    @CacheEvict(value = "userDetails", key = "#resetPasswordRequest.email")
     public void processResetPassword(ResetPasswordRequest resetPasswordRequest) {
         log.info("DB call for fetching the user");
         UserEntity user = userRepository.findByEmail(resetPasswordRequest.getEmail())

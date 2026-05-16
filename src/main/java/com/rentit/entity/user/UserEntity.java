@@ -1,7 +1,6 @@
 package com.rentit.entity.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.rentit.entity.auth.VerificationToken;
 import com.rentit.entity.post.RoomListing;
 import com.rentit.entity.post.RoommateListing;
 import com.rentit.entity.saved.SavedRoomPost;
@@ -56,10 +55,6 @@ public class UserEntity {
     @OneToMany(mappedBy = "user", cascade =  CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<SavedRoommatePost> savedRoommatePosts = new ArrayList<>();
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    private VerificationToken verificationToken;
 
     @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore

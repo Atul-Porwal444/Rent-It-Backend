@@ -13,7 +13,7 @@ public interface UserRepository extends JpaRepository<UserEntity,Long> {
 
     Optional<UserAuthProjection> getByEmail(String email);
 
-    @EntityGraph(attributePaths = {"profile", "userSettings", "verificationToken"})
+    @EntityGraph(attributePaths = {"profile", "userSettings"})
     Optional<UserEntity> findByEmail(String email);
 
 }

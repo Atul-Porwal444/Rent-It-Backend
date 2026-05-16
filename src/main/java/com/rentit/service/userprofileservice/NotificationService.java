@@ -12,6 +12,9 @@ import com.rentit.repository.user.NotificationRepository;
 import com.rentit.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
@@ -31,15 +34,27 @@ public class NotificationService {
 
     private final RoommateListingRepository roommateListingRepository;
 
+    private final RedisTemplate<String, String> redisTemplate;
+
+    private String getUnreadKey(String email) {
+        return "unread_flag:" + email;
+    }
+
     // Helper to send notifications from any class in backend
+    @CacheEvict(value = "notifications", key = "#recipient.email")
     public void createNotification(UserEntity recipient, String type, String message) {
         Notification notification = new Notification();
         notification.setUser(recipient);
         notification.setType(type);
         notification.setMessage(message);
+
+        log.info("DB call for saving the notification");
         notificationRepository.save(notification);
+
+        redisTemplate.opsForValue().set(getUnreadKey(recipient.getEmail()), "true");
     }
 
+    @Cacheable(value = "notifications", key = "#principal.name")
     public List<NotificationDto> getMyNotifications(Principal principal) {
         log.info("DB call for fetching the user");
         UserEntity user = userRepository.findByEmail(principal.getName())
@@ -52,14 +67,23 @@ public class NotificationService {
 
     // Checking if user has any unread notifications
     public boolean hasUnreadNotifications(Principal principal) {
-        log.info("DB call for fetching the user");
-        UserEntity user = userRepository.findByEmail(principal.getName())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        String email = principal.getName();
+        String flag = redisTemplate.opsForValue().get(getUnreadKey(email));
 
-        log.info("DB call for checking the unread notifications method is notificationRepository.countByUserAndIsReadFalse(user)");
-        return notificationRepository.countByUserAndIsReadFalse(user) > 0;
+        if(flag == null) {
+            log.info("Redis cache miss, now fetching unread notifications from DB");
+            UserEntity user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+            boolean hasUnread = notificationRepository.countByUserAndIsReadFalse(user) > 0;
+
+            redisTemplate.opsForValue().set(getUnreadKey(email), String.valueOf(hasUnread));
+            return hasUnread;
+        }
+
+        return Boolean.parseBoolean(flag);
     }
 
+    @CacheEvict(value = "notifications", key = "#principal.name")
     public void markAllAsRead(Principal principal) {
         log.info("DB call for fetching the user");
         UserEntity user = userRepository.findByEmail(principal.getName())
@@ -72,6 +96,8 @@ public class NotificationService {
         unread.forEach(n -> n.setRead(true));
         log.info("DB call for saving the unread notifications calling the method saveAll");
         notificationRepository.saveAll(unread);
+
+        redisTemplate.opsForValue().set(getUnreadKey(principal.getName()), "false");
     }
 
     public Boolean contactRoomOwner(Long id, Principal principal) {
@@ -82,12 +108,11 @@ public class NotificationService {
         log.info("DB call for getting the room owner by calling post.getOwner()");
         UserEntity owner =  post.getUser();
         if(owner != null) {
-            Notification notification = new Notification();
-            notification.setUser(owner);
-            notification.setType("alert");
-            notification.setMessage("User showed interest in your room post. Contact: " + principal.getName());
-            log.info("DB call for saving the notification");
-            notificationRepository.save(notification);
+            createNotification(owner,
+                            "alert",
+                        "User showed interest in your room post. Contact: " + principal.getName()
+            );
+
             return true;
         }
         return false;
@@ -101,12 +126,11 @@ public class NotificationService {
         log.info("DB call for getting the room owner by calling post.getOwner()");
         UserEntity owner =  post.getUser();
         if(owner != null) {
-            Notification notification = new Notification();
-            notification.setUser(owner);
-            notification.setType("alert");
-            notification.setMessage("User showed interest in your roommate post. Contact: " + principal.getName());
-            log.info("DB call for saving the notification");
-            notificationRepository.save(notification);
+            createNotification(owner,
+                                "alert",
+                                "User showed interest in your roommate post. Contact: " + principal.getName()
+            );
+
             return true;
         }
         return false;
